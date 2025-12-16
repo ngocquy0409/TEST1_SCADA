@@ -1,0 +1,145 @@
+﻿@{
+    ViewData["Title"] = "Cài đặt hệ thống";
+}
+
+<h4 class="mb-4">Cài đặt hệ thống</h4>
+
+<ul class="nav nav-tabs" id="settingTabs" role="tablist">
+
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active"
+                data-bs-toggle="tab"
+                data-bs-target="#shift">
+            Ca sản xuất
+        </button>
+    </li>
+
+    <li class="nav-item" role="presentation">
+        <button class="nav-link"
+                data-bs-toggle="tab"
+                data-bs-target="#production">
+            Nhập sản lượng
+        </button>
+    </li>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <li class="nav-item" role="presentation">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#parameter">
+                Thông số
+            </button>
+        </li>
+
+        <li class="nav-item" role="presentation">
+            <button class="nav-link"
+                    data-bs-toggle="tab"
+                    data-bs-target="#general">
+                Chung
+            </button>
+        </li>
+    }
+
+</ul>
+
+<div class="tab-content border border-top-0 p-4 bg-white">
+
+    <!-- CA SẢN XUẤT -->
+    <div class="tab-pane fade show active" id="shift">
+        @await Html.PartialAsync("_ShiftSetting")
+    </div>
+
+    <!-- NHẬP SẢN LƯỢNG -->
+    <div class="tab-pane fade" id="production">
+        @await Html.PartialAsync("_ProductionInput")
+    </div>
+
+    <!-- ADMIN -->
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="tab-pane fade" id="parameter">
+            @await Html.PartialAsync("_ParameterSetting")
+        </div>
+
+        <div class="tab-pane fade" id="general">
+            @await Html.PartialAsync("_GeneralSetting")
+        </div>
+    }
+
+</div>
+@section Scripts {
+    <script>
+        console.log("JS SETTINGS ĐÃ LOAD");
+
+        function themTruongCa() {
+            let ma = document.getElementById("ma_truong_ca").value;
+            let ten = document.getElementById("Ho_va_ten").value;
+            if(!ma || !ten){
+                alert("Vui lòng nhập đầy đủ thông tin của Trưởng Ca!");
+                return;
+            }
+            fetch('/Settings/AddTruongCa', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `maTruongCa=${ma}&hoVaTen=${ten}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                let table = document.querySelector("#tblTruongCa tbody");
+                let rowCount = table.rows.length + 1;
+                let row = table.insertRow();
+                row.setAttribute("data-id", data.id);
+                row.setAttribute("onclick", "chonDong(this,'truongca')");
+
+                row.innerHTML = `
+                    <td>${rowCount}</td>
+                    <td>${data.maTruongCa}</td>
+                    <td>${data.hovaTen}</td>
+                `;
+                document.getElementById("ma_truong_ca").value = "";
+                document.getElementById("Ho_va_ten").value = "";
+            })
+            .catch(err => console.error(err));
+        }
+    </script>
+    <script>
+        function themSanPham() {
+            let ma = document.getElementById("Ma_san_pham").value;
+            let ten = document.getElementById("Ten_san_pham").value;
+
+            fetch('/Settings/AddSanPham', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `maSanPham=${ma}&tenSanPham=${ten}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                let table = document.querySelector("#tblSanPham tbody");
+                let rowCount = table.rows.length + 1;
+
+                let row = table.insertRow();
+                row.setAttribute("data-id", data.id);
+                row.setAttribute("onclick", "chonDong(this,'sanpham')");
+
+                row.innerHTML = `
+                    <td>${rowCount}</td>
+                    <td>${data.maSanPham}</td>
+                    <td>${data.tenSanPham}</td>
+                `;
+
+                // clear input
+                document.getElementById("Ma_san_pham").value = "";
+                document.getElementById("Ten_san_pham").value = "";
+            })
+            .catch(err => console.error(err));
+        }
+    </script>
+    <script src="~/js/general-setting.js"></script>
+
+}
+

@@ -1,0 +1,22 @@
+﻿@model TEST1_SCADA.Data.Product
+
+<h2>Xóa sản phẩm</h2>
+
+<h4>Bạn có chắc chắn muốn xóa?</h4>
+
+<dl class="row">
+    <dt class="col-sm-2">Tên</dt>
+    <dd class="col-sm-10">@Model.Name</dd>
+
+    <dt class="col-sm-2">Số lượng</dt>
+    <dd class="col-sm-10">@Model.Quantity</dd>
+
+    <dt class="col-sm-2">Mô tả</dt>
+    <dd class="col-sm-10">@Model.Description</dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="ID" />
+    <button type="submit" class="btn btn-danger">Xóa</button>
+    <a asp-action="Index" class="btn btn-secondary">Hủy</a>
+</form>

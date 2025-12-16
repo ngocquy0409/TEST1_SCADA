@@ -1,0 +1,221 @@
+﻿@model TEST1_SCADA.Models.WriteData
+
+@{
+    ViewData["Title"] = "Giám sát";
+}
+
+<!-- ===================== STYLE ===================== -->
+<style>
+    #homecontainer {
+        display: flex;
+        gap: 24px;
+        padding: 20px;
+    }
+
+    .item {
+        flex: 1;
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Modern table style */
+    .data-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        font-size: 14px;
+    }
+
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #374151;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table td:first-child {
+            width: 80px;
+            font-weight: 600;
+        }
+
+    .scada-input {
+        width: 100%;
+        padding: 6px 8px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+    }
+
+    .btn-primary {
+        margin-top: 12px;
+    }
+
+    .status {
+        margin-top: 10px;
+        font-weight: 600;
+    }
+
+    .status-connected {
+        color: #16a34a;
+    }
+
+    .status-disconnected {
+        color: #dc2626;
+    }
+</style>
+
+<!-- ===================== HTML ===================== -->
+<div id="homecontainer">
+
+    <!-- WRITE DATA -->
+    <div class="item">
+        <h4>Ghi dữ liệu</h4>
+
+        <table class="data-table">
+            <tr>
+                <td>B1</td>
+                <td><input id="B1" type="number" class="scada-input" /></td>
+            </tr>
+            <tr>
+                <td>B2</td>
+                <td><input id="B2" type="number" class="scada-input" /></td>
+            </tr>
+            <tr>
+                <td>B3</td>
+                <td><input id="B3" type="number" class="scada-input" /></td>
+            </tr>
+        </table>
+
+        <button id="DataWriting" type="button" class="btn btn-primary">
+            Ghi dữ liệu
+        </button>
+    </div>
+
+    <!-- READ DATA -->
+    <div class="item">
+        <h4>Đọc dữ liệu</h4>
+
+        <table class="data-table">
+            <tr>
+                <td>A1</td>
+                <td><input id="A1" type="number" class="scada-input" disabled /></td>
+            </tr>
+            <tr>
+                <td>A2</td>
+                <td><input id="A2" type="number" class="scada-input" disabled /></td>
+            </tr>
+            <tr>
+                <td>A3</td>
+                <td><input id="A3" type="number" class="scada-input" disabled /></td>
+            </tr>
+        </table>
+
+        <button id="connect" type="button" class="btn btn-primary">
+            Kết nối
+        </button>
+
+        <div id="connectionStatus" class="status status-disconnected">
+            Disconnected
+        </div>
+    </div>
+
+</div>
+
+<!-- ===================== SCRIPT ===================== -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        let isWriting = false;
+
+        // CONNECT
+        $('#connect').click(function () {
+            $.ajax({
+                url: '/Monitor/Connect',
+                type: 'POST',
+                success: function (response) {
+                    $('#connectionStatus')
+                        .text('Connected')
+                        .removeClass('status-disconnected')
+                        .addClass('status-connected');
+
+                    alert(response.status);
+                },
+                error: function () {
+                    alert('Không kết nối được server');
+                }
+            });
+        });
+
+        // WRITE DATA
+        $('#DataWriting').click(function () {
+
+            if (isWriting) return;
+            isWriting = true;
+
+            let b1 = Number($('#B1').val());
+            let b2 = Number($('#B2').val());
+            let b3 = Number($('#B3').val());
+
+            if (isNaN(b1) || isNaN(b2) || isNaN(b3)) {
+                alert('Vui lòng nhập số hợp lệ');
+                isWriting = false;
+                return;
+            }
+
+            $.ajax({
+                url: '/Monitor/DataWriting',
+                type: 'POST',
+                data: { B1: b1, B2: b2, B3: b3 },
+                success: function (response) {
+                    if (response.success) {
+                        alert('Ghi dữ liệu thành công!');
+                    } else {
+                        alert('Lỗi: ' + response.message);
+                    }
+                },
+                error: function () {
+                    alert('Lỗi gửi dữ liệu');
+                },
+                complete: function () {
+                    isWriting = false;
+                }
+            });
+        });
+
+        // READ DATA
+        function updateData() {
+            $.ajax({
+                url: '/Monitor/DataReading',
+                type: 'GET',
+                    success: function (response) {
+                        if (response.success) {
+                            $('#A1').val(response.a1);
+                            $('#A2').val(response.a2);
+                            $('#A3').val(response.a3);
+                        } else {
+                            console.error(response.message);
+                            $('#connectionStatus')
+                                .text(response.message)
+                                .removeClass('status-connected')
+                                .addClass('status-disconnected');
+                        }
+                    },
+                    error: function (err) {
+                        console.error(err);
+                    }
+
+            });
+        }
+
+        setInterval(updateData, 500);
+    });
+</script>

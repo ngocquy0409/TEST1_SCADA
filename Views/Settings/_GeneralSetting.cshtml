@@ -1,0 +1,139 @@
+﻿<div class="card shadow-sm border-primary">
+    <div class="card-header bg-primary text-white fw-bold text-center">
+        THÔNG TIN TRƯỞNG CA VÀ SẢN PHẨM
+    </div>
+</div>
+</br>
+<div class="container">
+
+    <div class="row justify-content-center">
+
+        <!-- ===== Ô TRƯỞNG CA ===== -->
+        <div class="col-md-5 border border-dark p-3 me-3 bg-light">
+            <h5 class="text-center fw-bold mb-3">THÔNG TIN TRƯỞNG CA</h5>
+
+            <!-- NHẬP -->
+            <div class="row mb-2 align-items-center">
+                <div class="col-4 fw-bold">
+                    <label for="ma_truong_ca" class="form-label fw-bold mb-0">Mã Trưởng Ca</label>
+                </div>
+                <div class="col-8">
+                    <input id="ma_truong_ca" name="ma_truong_ca" class="form-control form-control-sm">
+                </div>
+            </div>
+
+            <div class="row mb-2 align-items-center">
+                <div class="col-4 fw-bold">
+                    <label for="Ho_va_ten" class="form-label fw-bold mb-0">Họ và Tên</label>
+                </div>
+                <div class="col-8">
+                    <input id="Ho_va_ten" name="Ho_va_ten" class="form-control form-control-sm">
+                </div>
+            </div>
+
+            <!-- BUTTON -->
+            <div class="text-end mb-2">
+                <button class="btn btn-success btn-sm me-2"
+                        onclick="themTruongCa()">
+                    Thêm
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="xoaTruongCa()">
+                    Xóa
+                </button>
+
+            </div>
+            <table class="table table-bordered table-sm text-center mt-2" id="tblTruongCa">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã Trưởng Ca</th>
+                        <th>Họ và Tên</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @{
+                    int stt = 1;
+                    foreach (var tc in ViewBag.TruongCa)
+                    {
+                        
+                        <tr data-id="@tc.Id" onclick="chonDong(this, 'truongca')">
+                            <td>@stt</td>
+                            <td>@tc.MaTruongCa</td>
+                            <td>@tc.HovaTen</td>
+                        </tr>
+                        stt++;
+                    }
+                   }
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- ===== Ô SẢN PHẨM ===== -->
+        <div class="col-md-5 border border-dark p-3 bg-light">
+            <h5 class="text-center fw-bold mb-3">THÔNG TIN SẢN PHẨM</h5>
+
+            <div class="row mb-2 align-items-center">
+                <div class="col-4 fw-bold">
+                    <label for="Ma_san_pham" class="form-label fw-bold mb-0">Mã Sản Phẩm</label>
+                </div>
+                <div class="col-8">
+                    <input id="Ma_san_pham" name="Ma_san_pham" class="form-control form-control-sm">
+                </div>
+            </div>
+
+            <div class="row mb-2 align-items-center">
+                <div class="col-4 fw-bold">
+                    <label for="Ten_san_pham" class="form-label fw-bold mb-0">Tên Sản Phẩm</label>
+                </div>
+                <div class="col-8">
+                    <input id="Ten_san_pham" name="Ten_san_pham" class="form-control form-control-sm">
+                </div>
+            </div>
+
+            <div class="text-end mb-2">
+                <button class="btn btn-success btn-sm me-2" onclick="themSanPham()"> Thêm </button>
+                <button class="btn btn-danger btn-sm" onclick="xoaSanPham()">
+                    Xóa
+                </button>
+
+            </div>
+            <table class="table table-bordered table-sm text-center mt-2" id="tblSanPham">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã Sản Phẩm</th>
+                        <th>Tên Sản Phẩm</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int stt1 = 1;
+                        foreach (var sp in ViewBag.SanPham)
+                    {
+                        <tr data-id="@sp.Id" onclick="chonDong(this,'sanpham')">
+                            <td>@stt1</td>
+                            <td>@sp.TenSanPham</td>
+                            <td>@sp.MaSanPham</td>
+                        </tr>
+                        stt1++;
+                    }
+                    }
+                </tbody>
+            </table>
+
+        </div>
+
+
+    </div>
+
+    <!-- NÚT LƯU -->
+    <div class="text-center mt-3">
+        <button class="btn btn-primary px-5 fw-bold">
+            LƯU
+        </button>
+    </div>
+
+</div>
+
+

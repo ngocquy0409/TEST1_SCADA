@@ -1,0 +1,159 @@
+﻿<div class="card shadow-sm border-primary">
+    <div class="card-header bg-primary text-white fw-bold text-center">
+        CÀI ĐẶT THÔNG SỐ
+    </div>
+</div>
+<div class="row justify-content-center">
+    <div class="col-4 text-end fw-bold fs-5">
+        <label>
+            <input type="radio" name="setting" checked>
+            Cài Đặt Tham Số
+        </label>
+    </div>
+    <div class="col-4 text-start fw-bold fs-5">
+        <label>
+            <input type="radio" name="setting">
+            Không Cài Đặt Tham Số
+        </label>
+    </div>
+</div>
+<div class="mx-auto" style="max-width: 750px">
+    <div class="border border-dark p-3 mb-3 bg-primary bg-opacity-25">
+
+        <div class="row mb-2 align-items-center">
+            <div class="col-4">
+                <label for="ten_day_chuyen" class="form-label fw-bold mb-0"> Tên dây chuyền </label>
+            </div>
+            <div class="col-8">
+                <select id="ten_day_chuyen" name="ten_day_chuyen" class="form-select form-select-sm">
+                    <option>Dây chuyền 1</option>
+                    <option>Dây chuyền 2</option>
+                    <option>Dây chuyền 3</option>
+                    <option>Dây chuyền 4</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-2 align-items-center">
+            <div class="col-4">
+                <label for="ten_may" class="form-label fw-bold mb-0"> Tên máy </label>
+            </div>
+            <div class="col-8">
+                <select id="ten_may" name="ten_may" class="form-select form-select-sm">
+                    <option>Máy 1</option>
+                    <option>Máy 2</option>
+                    <option>Máy 3</option>
+                    <option>Máy 4</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-2 align-items-center">
+            <div class="col-4">
+                <label for="ca" class="form-label fw-bold mb-0"> Ca </label>
+            </div>
+            <div class="col-8">
+                <select id="ca" name="ca" class="form-select form-select-sm">
+                    <option>Ca 1</option>
+                    <option>Ca 2</option>
+                    <option>Ca 3</option>
+                    <option>Ca 4</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-2 align-items-center">
+            <div class="col-4">
+                <label for="ma_san_pham" class="form-label fw-bold mb-0">Mã sản phẩm</label>
+            </div>
+            <div class="col-8">
+                <select id="ma_san_pham" name="ma_san_pham" class="form-select form-select-sm">
+                    <option>[ALL]</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-2 align-items-center">
+            <div class="col-4">
+                <label for="ten_san_pham" class="form-label fw-bold mb-0"> Tên sản phẩm </label>
+            </div>
+            <div class="col-8">
+                <select id="ten_san_pham" name="ten_san_pham" class="form-select form-select-sm">
+                    <option>[ALL]</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="border border-dark p-3 mb-3 bg-primary bg-opacity-10">
+        <div class="row mb-2 align-items-center">
+            <div class="col-5">
+                <label for="toc_do_chuan" class="form-label fw-bold mb-0">Tốc độ chuẩn [gói/phút]</label>
+            </div>
+            <div class="col-7">
+                <input type="text" id="toc_do_chuan" name="toc_do_chuan" class="form-control" placeholder="Nhập tốc độ chuẩn" />
+            </div>
+        </div>
+
+        <div class="row mb-2 align-items-center">
+            <div class="col-5">
+                <label for="dung_may" class="form-label fw-bold mb-0"> Thời gian dừng máy </label>
+            </div>
+            <div class="col-7">
+                <input type="text" id="dung_may" name="dung_may" class="form-control" placeholder="Nhập thời gian dừng máy" />
+            </div>
+        </div>
+
+
+        <div class="row mb-2 align-items-center">
+            <div class="col-5">
+                <label for="chap_nhan_goi" class="form-label fw-bold mb-0"> Thời gian chấp nhận gói [x0.1s] </label>
+            </div>
+            <div class="col-7">
+                <input type="text" id="chap_nhan_goi" name="chap_nhan_goi" class="form-control" placeholder="Nhập thời gian chấp nhận gói" />
+            </div>
+        </div>
+
+        <div class="row mb-2 align-items-center">
+            <div class="col-5">
+                <label for="goi_can" class="form-label fw-bold mb-0"> Thời gian gói cân [x0.1s] </label>
+            </div>
+            <div class="col-7">
+                <input type="text" id="goi_can" name="goi_can" class="form-control" placeholder="Nhập thời gian gói cân" />
+            </div>
+        </div>
+
+        <div class="row mb-2 align-items-center">
+            <div class="col-5">
+                <label for="day_goi" class="form-label fw-bold mb-0"> Thời gian đẩy gói cân [x0.1s]</label>
+            </div>
+            <div class="col-7">
+                <input type="text" id="day_goi" name="day_goi" class="form-control" placeholder="Nhập thời gian đẩy gói cân" />
+            </div>
+        </div>
+
+        <div class="row mb-2 align-items-center">
+            <div class="col-5">
+                <label for="cap_nhat" class="form-label fw-bold mb-0"> Thời gian cập nhật từ PLC [s]</label>
+            </div>
+            <div class="col-7">
+                <input type="text" id="cap_nhat" name="cap_nhat" class="form-control" placeholder="Nhập thời gian cập nhật từ PLC" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- BUTTON -->
+<div class="text-center mb-3">
+    <button class="btn btn-success me-2 px-4">Thiết Lập</button>
+    <button class="btn btn-success px-4">Ghi Xuống</button>
+</div>
+
+<!-- THOÁT -->
+<div class="text-center">
+    <button class="btn btn-warning px-5 fw-bold">Thoát</button>
+</div>
+
+
+

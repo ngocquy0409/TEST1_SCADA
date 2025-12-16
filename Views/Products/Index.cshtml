@@ -1,0 +1,46 @@
+﻿@model IEnumerable<TEST1_SCADA.Data.Product>
+
+<h2>Danh sách sản phẩm</h2>
+
+@if (User.IsInRole("Admin"))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Thêm sản phẩm</a>
+    </p>
+}
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tên</th>
+            <th>Số lượng</th>
+            <th>Mô tả</th>
+            @if (User.IsInRole("Admin"))
+            {
+                <th>Thao tác</th>
+            }
+            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ID</td>
+                <td>@item.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.Description</td>
+                @if (User.IsInRole("Admin"))
+                {
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.ID">Chi tiết</a> |
+                        <a asp-action="Edit" asp-route-id="@item.ID">Sửa</a> |
+                        <a asp-action="Delete" asp-route-id="@item.ID">Xóa</a>
+                    </td>
+                }
+                
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,44 @@
+﻿@model IEnumerable<Microsoft.AspNetCore.Identity.IdentityRole> // Đảm bảo nhập đúng namespace và tên lớp của mô hình
+
+<h2>Quản lý vai trò người dùng</h2>
+
+<!-- Hiển thị danh sách vai trò hiện có -->
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên Vai Trò</th>
+            <th>Hành Động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var role in Model)
+        {
+            <tr>
+                <td>@role.Name</td>
+                <td>
+                    <form asp-action="EditRole" method="post" style="display:inline">
+                        <input type="hidden" name="roleId" value="@role.Id" />
+                        <input type="text" name="roleName" value="@role.Name" />
+                        <button type="submit" class="btn btn-warning">Chỉnh Sửa</button>
+                    </form>
+
+                    <form asp-action="DeleteRole" method="post" style="display:inline">
+                        <input type="hidden" name="roleId" value="@role.Id" />
+                        <button type="submit" class="btn btn-danger">Xóa</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!--Thêm vai trò mới-->
+<h4>Thêm Vai Trò Mới</h4>
+<form asp-action="AddRole" method="post">
+    <div class="form-group">
+        <input type="text" name="roleName" class="form-control" placeholder="Tên vai trò mới" /> <!--Nhập tên vai trò mới-->
+    </div>
+    <button type="submit" class="btn btn-primary">Thêm Vai Trò</button>
+    <
+</form>
