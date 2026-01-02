@@ -9,8 +9,6 @@ namespace TEST1_SCADA.Data
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-        public DbSet<Product> Product { get; set; }
-
         public DbSet<TruongCa> TruongCa { get; set; }
 
         public DbSet<SanPham> SanPham { get; set; }

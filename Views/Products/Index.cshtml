@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TEST1_SCADA.Data.Product>
+﻿@model IEnumerable<TEST1_SCADA.Models.SanPham>
 
 <h2>Danh sách sản phẩm</h2>
 
@@ -27,16 +27,15 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.ID</td>
-                <td>@item.Name</td>
-                <td>@item.Quantity</td>
-                <td>@item.Description</td>
+                <td>@item.Id</td>
+                <td>@item.MaSanPham</td>
+                <td>@item.TenSanPham</td>
                 @if (User.IsInRole("Admin"))
                 {
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.ID">Chi tiết</a> |
-                        <a asp-action="Edit" asp-route-id="@item.ID">Sửa</a> |
-                        <a asp-action="Delete" asp-route-id="@item.ID">Xóa</a>
+                        <a asp-action="Details" asp-route-id="@item.Id">Chi tiết</a> |
+                        <a asp-action="Edit" asp-route-id="@item.Id">Sửa</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Xóa</a>
                     </td>
                 }
                 

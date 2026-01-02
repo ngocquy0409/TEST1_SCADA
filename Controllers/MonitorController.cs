@@ -7,7 +7,7 @@ namespace TEST1_SCADA.Controllers
 {
     public class MonitorController : Controller
     {
-        private static Plc _plc = new Plc(CpuType.S71200, "192.168.56.1", 0, 0); // Tạo kết nối với PLC S71200
+        private static Plc _plc = new Plc(CpuType.S71200, "192.168.56.1", 0, 1); // Tạo kết nối với PLC S71200
 
         private readonly ILogger<MonitorController> _logger; // Biến để ghi log
 

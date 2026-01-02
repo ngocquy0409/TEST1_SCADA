@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TEST1_SCADA.Data;
+using TEST1_SCADA.Models;   // + thêm dòng này
 
 namespace TEST1_SCADA.Controllers
 {
@@ -13,24 +14,21 @@ namespace TEST1_SCADA.Controllers
             _context = context;
         }
 
-        // ===================== INDEX =====================
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Product.ToListAsync());
+            return View(await _context.SanPham.ToListAsync());
         }
 
-        // ===================== DETAILS =====================
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
 
-            var product = await _context.Product.FirstOrDefaultAsync(m => m.ID == id);
-            if (product == null) return NotFound();
+            var sp = await _context.SanPham.FirstOrDefaultAsync(m => m.Id == id);
+            if (sp == null) return NotFound();
 
-            return View(product);
+            return View(sp);
         }
 
-        // ===================== CREATE =====================
         public IActionResult Create()
         {
             return View();
@@ -38,72 +36,70 @@ namespace TEST1_SCADA.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Product product)
+        public async Task<IActionResult> Create(SanPham sp)   // Product -> SanPham
         {
             if (ModelState.IsValid)
             {
-                _context.Add(product);
+                _context.SanPham.Add(sp);                      // Add(product) -> Add(sp)
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(product);
+            return View(sp);
         }
 
-        // ===================== EDIT =====================
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
-            var product = await _context.Product.FindAsync(id);
-            if (product == null) return NotFound();
+            var sp = await _context.SanPham.FindAsync(id);
+            if (sp == null) return NotFound();
 
-            return View(product);
+            return View(sp);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Product product)
+        public async Task<IActionResult> Edit(int id, SanPham sp)   // Product -> SanPham
         {
-            if (id != product.ID) return NotFound();
+            if (id != sp.Id) return NotFound();                     // ID -> Id
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(product);
+                    _context.SanPham.Update(sp);                    // Update(product) -> Update(sp)
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.Product.Any(e => e.ID == product.ID))
+                    if (!_context.SanPham.Any(e => e.Id == sp.Id))  // ID -> Id
                         return NotFound();
                     else
                         throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(product);
+            return View(sp);
         }
 
-        // ===================== DELETE =====================
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
-            var product = await _context.Product.FirstOrDefaultAsync(m => m.ID == id);
-            if (product == null) return NotFound();
+            var sp = await _context.SanPham.FirstOrDefaultAsync(m => m.Id == id);
+            if (sp == null) return NotFound();
 
-            return View(product);
+            return View(sp);
         }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Product.FindAsync(id);
-            if (product != null)
+            var sp = await _context.SanPham.FindAsync(id);
+            if (sp != null)
             {
-                _context.Product.Remove(product);
+                _context.SanPham.Remove(sp);
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
