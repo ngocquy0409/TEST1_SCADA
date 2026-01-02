@@ -12,10 +12,8 @@
 <table class="table table-bordered">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Tên</th>
-            <th>Số lượng</th>
-            <th>Mô tả</th>
+            <th>Mã Sản Phẩm</th>
+            <th>Tên Sản Phẩm</th>
             @if (User.IsInRole("Admin"))
             {
                 <th>Thao tác</th>
@@ -27,7 +25,6 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@item.Id</td>
                 <td>@item.MaSanPham</td>
                 <td>@item.TenSanPham</td>
                 @if (User.IsInRole("Admin"))

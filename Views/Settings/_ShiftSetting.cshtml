@@ -1,5 +1,7 @@
 ﻿@* _ShiftSetting.cshtml *@
-
+@{
+    var truongCas = ViewBag.TruongCa as List<TruongCa> ?? new List<TruongCa>();
+}
 <div class="card shadow-sm border-primary">
     <div class="card-header bg-primary text-white fw-bold text-center">
         CÀI ĐẶT CA SẢN XUẤT
