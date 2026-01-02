@@ -49,7 +49,7 @@ namespace TEST1_SCADA.Controllers
 
             return Json(new
             {
-                id = tc.Id,
+                Id = tc.Id,
                 maTruongCa = tc.MaTruongCa,
                 hovaTen = tc.HovaTen
             });
@@ -68,6 +68,7 @@ namespace TEST1_SCADA.Controllers
 
             return Json(new
             {
+                Id = sp.Id,
                 maSanPham = sp.MaSanPham,
                 tenSanPham = sp.TenSanPham
             });

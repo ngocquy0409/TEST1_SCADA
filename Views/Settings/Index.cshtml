@@ -119,6 +119,23 @@
             })
             .then(res => res.json())
             .then(data => {
+                @*cập nhật danh sách thả xuống cho cài đặt ca sản xuất *@
+                console.log("server trả về:", data); // phải thấy data.i
+                ["truongCaSelect1","truongCaSelect2","truongCaSelect3"].forEach(id=>{
+                    const sel = document.getElementById(id);
+                    if(!sel) return;
+
+                        // tránh trùng mã
+                    const exists = Array.from(sel.options).some(o => o.text.trim() === data.maTruongCa);
+                    if (exists) return;
+
+                const opt = document.createElement("option");
+                opt.value = data.id;
+                opt.textContent = data.maTruongCa;
+                opt.setAttribute("data-name", data.hovaTen);
+                sel.appendChild(opt);
+                });
+                @* thêm vào bảng *@
                 let table = document.querySelector("#tblSanPham tbody");
                 let rowCount = table.rows.length + 1;
 
@@ -139,6 +156,28 @@
             .catch(err => console.error(err));
         }
     </script>
+    <!--JS auto-fill tên trưởng ca-->
+    <script>
+        document.addEventListener("change", function (e) {
+          const el = e.target;
+          if (!el) return;
+
+          const map = {
+            "truongCaSelect1": "truongCaName1",
+            "truongCaSelect2": "truongCaName2",
+            "truongCaSelect3": "truongCaName3"
+          };
+
+          const inputId = map[el.id];
+          if (!inputId) return;
+
+          const opt = el.options[el.selectedIndex];
+          const name = opt?.getAttribute("data-name") || "";
+          const input = document.getElementById(inputId);
+          if (input) input.value = name;
+        });
+    </script>
+
     <script src="~/js/general-setting.js"></script>
 
 }

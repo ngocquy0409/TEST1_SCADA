@@ -1,4 +1,5 @@
 ﻿@* _ShiftSetting.cshtml *@
+@using TEST1_SCADA.Models
 @{
     var truongCas = ViewBag.TruongCa as List<TruongCa> ?? new List<TruongCa>();
 }
@@ -38,23 +39,25 @@
 
                 <div class="row mb-3">
                     <div class="col-md-5">
-                        <label for="Ma_truong_ca1" class="form-label">Mã trưởng ca</label>
+                        <label for="truongCaSelect1" class="form-label">Mã trưởng ca</label>
                     </div>
                     <div class="col-md-7">
-                        <select id="Ma_truong_ca1" name="Ma_truong_ca1" class="form-select" >
+                        <select id="truongCaSelect1" name="truongCaSelect1" class="form-select">
                             <option>[Chọn Trưởng Ca]</option>
-                            <option>TC01</option>
-                            <option>TC02</option>
+                            @foreach (var tc in truongCas)
+                            {
+                            <option value="@tc.Id" data-name="@tc.HovaTen">@tc.MaTruongCa</option>
+                            }
                         </select>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-5">
-                        <label for="truong_ca1" class="form-label">Trưởng ca</label>
+                        <label for="truongCaName1" class="form-label">Trưởng ca</label>
                     </div>
                     <div class="col-md-7">
-                        <input id="truong_ca1" name="truong_ca1" class="form-control" placeholder="Nhập tên trưởng ca"/>
+                        <input id="truongCaName1" class="form-control" readonly />
                     </div>
                 </div>
             </fieldset>
@@ -86,23 +89,25 @@
 
                 <div class="row mb-3">
                     <div class="col-md-5">
-                        <label for="Ma_truong_ca2" class="form-label">Mã trưởng ca</label>
+                        <label for="truongCaSelect2" class="form-label">Mã trưởng ca</label>
                     </div>
                     <div class="col-md-7">
-                        <select id="Ma_truong_ca2" name="Ma_truong_ca2" class="form-select">
+                        <select id="truongCaSelect2" name="truongCaSelect1" class="form-select">
                             <option>[Chọn Trưởng Ca]</option>
-                            <option>TC01</option>
-                            <option>TC02</option>
+                            @foreach (var tc in truongCas)
+                            {
+                                <option value="@tc.Id" data-name="@tc.HovaTen">@tc.MaTruongCa</option>
+                            }
                         </select>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-5">
-                        <label for="truong_ca2" class="form-label">Trưởng ca</label>
+                        <label for="truongCaName2" class="form-label">Trưởng ca</label>
                     </div>
                     <div class="col-md-7">
-                        <input id="truong_ca2" name="truong_ca2" class="form-control" placeholder="Nhập tên trưởng ca" />
+                        <input id="truongCaName2" class="form-control" readonly />
                     </div>
                 </div>
             </fieldset>
@@ -134,23 +139,25 @@
 
                 <div class="row mb-3">
                     <div class="col-md-5">
-                        <label for="Ma_truong_ca3" class="form-label">Mã trưởng ca</label>
+                        <label for="truongCaSelect3" class="form-label">Mã trưởng ca</label>
                     </div>
                     <div class="col-md-7">
-                        <select id="Ma_truong_ca3" name="Ma_truong_ca3" class="form-select">
+                        <select id="truongCaSelect3" name="truongCaSelect1" class="form-select">
                             <option>[Chọn Trưởng Ca]</option>
-                            <option>TC01</option>
-                            <option>TC02</option>
+                            @foreach (var tc in truongCas)
+                            {
+                                <option value="@tc.Id" data-name="@tc.HovaTen">@tc.MaTruongCa</option>
+                            }
                         </select>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <div class="col-md-5">
-                        <label for="truong_ca3" class="form-label">Trưởng ca</label>
+                        <label for="truongCaName3" class="form-label">Trưởng ca</label>
                     </div>
                     <div class="col-md-7">
-                        <input id="truong_ca3" name="truong_ca3" class="form-control" placeholder="Nhập tên trưởng ca" />
+                        <input id="truongCaName3" class="form-control" readonly />
                     </div>
                 </div>
             </fieldset>
