@@ -12,8 +12,8 @@ using TEST1_SCADA.Data;
 namespace TEST1_SCADA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251214040634_addIdentity")]
-    partial class addIdentity
+    [Migration("20260102164354_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -225,6 +225,73 @@ namespace TEST1_SCADA.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("TEST1_SCADA.Models.SanPham", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("MaSanPham")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenSanPham")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SanPham");
+                });
+
+            modelBuilder.Entity("TEST1_SCADA.Models.ShiftConfig", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CaSo")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GioBatDau")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PhutBatDau")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TruongCaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ShiftConfigs");
+                });
+
+            modelBuilder.Entity("TEST1_SCADA.Models.TruongCa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("HovaTen")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("MaTruongCa")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TruongCa");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

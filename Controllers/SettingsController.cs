@@ -97,7 +97,62 @@ namespace TEST1_SCADA.Controllers
             return Ok();
         }
 
+        // tạo API lưu cấu hình cho cài đặt ca sản xuất
+        public class SaveShiftConfigDto
+        {
+            public int CaSo { get; set; }
+            public int GioBatDau { get; set; }
+            public int PhutBatDau { get; set; }
+            public int TruongCaId { get; set; }
+        }
+        [HttpPost]
+        // API để lưu cấu hình ca sản xuất (ShiftConfig)
+        public IActionResult SaveShiftConfig([FromBody] List<SaveShiftConfigDto> configs)
+        {
+            if (configs == null || configs.Count == 0)
+                return BadRequest("Body JSON rỗng hoặc sai format. configs == null");
+            if (configs.Count == 0)
+                return BadRequest("configs rỗng");
+            foreach (var c in configs)
+            {
+                var exist = _context.ShiftConfigs.FirstOrDefault(s => s.CaSo == c.CaSo); // kiểm tra ca số đã tồn tại chưa
+                if (exist == null)
+                {
+                    _context.ShiftConfigs.Add(new ShiftConfig // nếu chưa tồn tại thì thêm mới
+                    {
+                        CaSo = c.CaSo,              // gán các thuộc tính
+                        GioBatDau = c.GioBatDau,    // từ đối tượng DTO nhận vào
+                        PhutBatDau = c.PhutBatDau,  // đến đối tượng ShiftConfig
+                        TruongCaId = c.TruongCaId   // rồi thêm vào cơ sở dữ liệu
+                    });
+                }
+                else    //  nếu đã tồn tại thì cập nhật lại
+                {
+                    exist.GioBatDau = c.GioBatDau;
+                    exist.PhutBatDau = c.PhutBatDau;
+                    exist.TruongCaId = c.TruongCaId;
+                }
+            }
+            _context.SaveChanges();         // lưu thay đổi vào cơ sở dữ liệu
+            return Ok(new { ok = true });                  // trả về mã trạng thái 200 OK    
+        }
+        // kết thúc API lưu cấu hình ca sản xuất
+        [HttpGet]
+        // API load cấu hình để hiển thị khi vào lại trang
+        public IActionResult GetShiftConfig() // lấy dữ liệu cấu hình ca sản xuất
+        {
+            var data = _context.ShiftConfigs    // truy vấn bảng ShiftConfigs
+                .Select(x => new        // chọn các trường cần thiết để trả về
+                {
+                    x.CaSo,
+                    x.GioBatDau,
+                    x.PhutBatDau,
+                    x.TruongCaId
+                })
+                .ToList();
 
+            return Json(data);
+        }
     }
 
 }

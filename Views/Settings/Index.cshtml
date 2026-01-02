@@ -178,6 +178,68 @@
         });
     </script>
 
+    <!--JS cho nút "Xác nhận"-->
+    <script>
+        document.getElementById("btnXacNhan")?.addEventListener("click", function () {
+
+          const payload = [
+            {
+              caSo: 1,
+              gioBatDau: parseInt(document.getElementById("gio1").value),
+              phutBatDau: parseInt(document.getElementById("phut1").value),
+              truongCaId: parseInt(document.getElementById("truongCaSelect1").value || "0")
+            },
+            {
+              caSo: 2,
+              gioBatDau: parseInt(document.getElementById("gio2").value),
+              phutBatDau: parseInt(document.getElementById("phut2").value),
+              truongCaId: parseInt(document.getElementById("truongCaSelect2").value || "0")
+            },
+            {
+              caSo: 3,
+              gioBatDau: parseInt(document.getElementById("gio3").value),
+              phutBatDau: parseInt(document.getElementById("phut3").value),
+              truongCaId: parseInt(document.getElementById("truongCaSelect3").value || "0")
+            }
+          ];
+
+          // validate
+          if (payload.some(x => x.truongCaId === 0)) {
+            alert("Vui lòng chọn trưởng ca cho cả 3 ca!");
+            return;
+          }
+
+          fetch('/Settings/SaveShiftConfig', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          })
+          .then(r => {
+            if (!r.ok) throw new Error("Save failed");
+            alert("Đã lưu cấu hình ca sản xuất!");
+          })
+          .catch(err => {
+            console.error(err);
+            alert("Lưu thất bại!");
+          });
+        });
+    </script>
+    <!--Tự load config khi mở trang-->
+    <script>
+        fetch('/Settings/GetShiftConfig')
+          .then(r => r.json())
+          .then(list => {
+            list.forEach(c => {
+              document.getElementById("gio" + c.caSo).value = c.gioBatDau;
+              document.getElementById("phut" + c.caSo).value = String(c.phutBatDau).padStart(2, '0');
+              document.getElementById("truongCaSelect" + c.caSo).value = c.truongCaId;
+
+              // trigger change để auto-fill tên
+              document.getElementById("truongCaSelect" + c.caSo).dispatchEvent(new Event('change'));
+            });
+          });
+    </script>
+
     <script src="~/js/general-setting.js"></script>
 
 }
