@@ -127,7 +127,159 @@
     </div>
 
 </div>
+<div class="container-fluid py-3" style="background:#eef6ff; min-height: calc(100vh - 120px);">
+    <!-- TOP -->
+    <div class="row g-3 align-items-stretch">
+        <!-- Left control -->
+        <div class="col-12 col-lg-4">
+            <div class="card shadow-sm border-primary h-100">
+                <div class="card-header bg-primary text-white fw-bold">
+                    Chọn hiển thị
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Chọn dây chuyền hiển thị</label>
+                        <select id="lineSelect" class="form-select">
+                            <option value="1">Dây chuyền 1</option>
+                            <option value="2">Dây chuyền 2</option>
+                            <option value="3">Dây chuyền 3</option>
+                            <option value="4">Dây chuyền 4</option>
+                        </select>
+                    </div>
 
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold">Ca làm việc:</span>
+                        <span id="shiftText" class="badge bg-info text-dark px-3 py-2">Ca 1</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle info -->
+        <div class="col-12 col-lg-8">
+            <div class="card shadow-sm border-primary h-100">
+                <div class="card-header bg-primary text-white fw-bold">
+                    Thông tin đang chạy
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-12 col-md-6">
+                            <div class="p-3 rounded border bg-white">
+                                <div class="d-flex justify-content-between">
+                                    <span class="fw-bold">Tên trưởng ca:</span>
+                                    <span id="leaderName" class="text-primary fw-semibold">---</span>
+                                </div>
+                                <hr class="my-2" />
+                                <div class="d-flex justify-content-between">
+                                    <span class="fw-bold">Mã trưởng ca:</span>
+                                    <span id="leaderCode" class="text-primary fw-semibold">---</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="p-3 rounded border bg-white">
+                                <div class="d-flex justify-content-between">
+                                    <span class="fw-bold">Tên sản phẩm:</span>
+                                    <span id="productName" class="text-primary fw-semibold">---</span>
+                                </div>
+                                <hr class="my-2" />
+                                <div class="d-flex justify-content-between">
+                                    <span class="fw-bold">Mã sản phẩm:</span>
+                                    <span id="productCode" class="text-primary fw-semibold">---</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <span id="lineTitle" class="badge bg-primary fs-6 px-4 py-2">
+                            Dây chuyền 1
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MACHINES -->
+    <div class="row g-3 mt-1">
+        @for (int i = 1; i <= 4; i++)
+        {
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="card shadow-sm border-primary h-100">
+                    <div class="card-header bg-info text-dark fw-bold text-center">
+                        Máy @i
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2 align-items-center mb-2">
+                            <div class="col-7 fw-bold small">Tốc độ máy [gói/phút]</div>
+                            <div class="col-5">
+                                <input id="m@i_speed" class="form-control form-control-sm" readonly />
+                            </div>
+                        </div>
+
+                        <div class="row g-2 align-items-center mb-2">
+                            <div class="col-7 fw-bold small">Hiệu suất OEE [%]</div>
+                            <div class="col-5">
+                                <input id="m@i_oee" class="form-control form-control-sm" readonly />
+                            </div>
+                        </div>
+
+                        <div class="row g-2 align-items-center mb-2">
+                            <div class="col-7 fw-bold small">Số lần dừng quá 5 giây</div>
+                            <div class="col-5">
+                                <input id="m@i_stop5s" class="form-control form-control-sm" readonly />
+                            </div>
+                        </div>
+
+                        <div class="row g-2 align-items-center mb-2">
+                            <div class="col-7 fw-bold small">Số lần dừng quá 5 phút</div>
+                            <div class="col-5">
+                                <input id="m@i_stop5m" class="form-control form-control-sm" readonly />
+                            </div>
+                        </div>
+
+                        <div class="row g-2 align-items-center mb-2">
+                            <div class="col-7 fw-bold small">Phần trăm gói rỗng [%]</div>
+                            <div class="col-5">
+                                <input id="m@i_emptyPct" class="form-control form-control-sm" readonly />
+                            </div>
+                        </div>
+
+                        <div class="row g-2 align-items-center mb-2">
+                            <div class="col-7 fw-bold small">Tổng số gói [gói]</div>
+                            <div class="col-5">
+                                <input id="m@i_total" class="form-control form-control-sm" readonly />
+                            </div>
+                        </div>
+
+                        <div class="row g-2 align-items-center mb-2">
+                            <div class="col-7 fw-bold small">Số gói tốt [gói]</div>
+                            <div class="col-5">
+                                <input id="m@i_good" class="form-control form-control-sm" readonly />
+                            </div>
+                        </div>
+
+                        <div class="row g-2 align-items-center mb-2">
+                            <div class="col-7 fw-bold small">Số gói bị cấn gia vị [gói]</div>
+                            <div class="col-5">
+                                <input id="m@i_jam" class="form-control form-control-sm" readonly />
+                            </div>
+                        </div>
+
+                        <div class="row g-2 align-items-center">
+                            <div class="col-7 fw-bold small">Số gói rỗng [gói]</div>
+                            <div class="col-5">
+                                <input id="m@i_empty" class="form-control form-control-sm" readonly />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
 <!-- ===================== SCRIPT ===================== -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -219,3 +371,35 @@
         setInterval(updateData, 500);
     });
 </script>
+
+@section Scripts {
+    <script>
+        // demo data (để bạn thấy UI chạy). Sau này thay bằng fetch API.
+        function fillDemo(line){
+          document.getElementById("lineTitle").textContent = "Dây chuyền " + line;
+          document.getElementById("shiftText").textContent = "Ca 1";
+
+          document.getElementById("leaderName").textContent = "Nguyễn Văn A";
+          document.getElementById("leaderCode").textContent = "TC01";
+          document.getElementById("productName").textContent = "Bánh mì";
+          document.getElementById("productCode").textContent = "SP01";
+
+          for(let i=1;i<=4;i++){
+            document.getElementById(`m${i}_speed`).value = 120 + i;
+            document.getElementById(`m${i}_oee`).value = (85 + i) + "%";
+            document.getElementById(`m${i}_stop5s`).value = 2*i;
+            document.getElementById(`m${i}_stop5m`).value = i;
+            document.getElementById(`m${i}_emptyPct`).value = (1.2*i).toFixed(1) + "%";
+            document.getElementById(`m${i}_total`).value = 1000*i;
+            document.getElementById(`m${i}_good`).value = 980*i;
+            document.getElementById(`m${i}_jam`).value = 10*i;
+            document.getElementById(`m${i}_empty`).value = 10*i;
+          }
+        }
+
+        document.getElementById("lineSelect").addEventListener("change", function(){
+          fillDemo(this.value);
+        });
+        fillDemo(document.getElementById("lineSelect").value);
+    </script>
+}
