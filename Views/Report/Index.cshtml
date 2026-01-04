@@ -1,8 +1,184 @@
 ﻿@{
-    ViewData["Title"] = "Lấy báo cáo";
+    ViewData["Title"] = "Báo cáo PLC";
+    Layout = "_Layout";
+
+    // Demo data (sau này thay bằng dữ liệu PLC)
+    var demo = new Dictionary<string, string>
+    {
+        ["MTTR"] = "12.5",
+        ["MTBF"] = "6.2",
+        ["StopPct"] = "8.4",
+        ["FaultPct"] = "2.1",
+        ["A"] = "97.9",
+
+        ["SpeedLossPct"] = "6.8",
+        ["Vtb"] = "245",
+        ["MinorStopPct"] = "5.9",
+        ["P"] = "89.4",
+
+        ["SpicePct"] = "1.7",
+        ["EmptyPct"] = "0.6",
+        ["Q"] = "98.9",
+
+        ["OEE1"] = "86.5",
+        ["OEE2"] = "86.3",
+        ["OEE3"] = "84.9"
+    };
 }
 
-<h2> Trang lấy báo cáo</h2>
-<h3>Phần này sẽ đưa ra các thông tin đánh giá tổng thể như OEE</h3>
+<div class="container py-3">
+    <div class="d-flex flex-wrap gap-2 align-items-center justify-content-center mb-3 text-center">
+        <h4 class="mb-0 text-primary fw-bold">Bảng thông số đánh giá</h4>
+    </div>
 
 
+    <!-- Bộ lọc -->
+    <div class="card shadow-sm border-0 mb-3 mx-auto" style="max-width: 900px;">
+        <div class="card-body">
+            <div class="row g-1 align-items-end">
+                <div class="col-12 col-md-3">
+                    <label class="form-label fw-semibold">Dây chuyền</label>
+                    <select class="form-select">
+                        <option>Dây chuyền 1</option>
+                        <option>Dây chuyền 2</option>
+                        <option>Dây chuyền 3</option>
+                        <option>Dây chuyền 4</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label fw-semibold">Máy</label>
+                    <select class="form-select">
+                        <option>Máy 1</option>
+                        <option>Máy 2</option>
+                        <option>Máy 3</option>
+                        <option>Máy 4</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label fw-semibold">Ca</label>
+                    <select class="form-select">
+                        <option>Ca 1</option>
+                        <option>Ca 2</option>
+                        <option>Ca 3</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-2 text-md-end">
+                    <button type="button" class="btn btn-primary px-4">Xem</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng báo cáo -->
+    <div class="card shadow-sm border-0 mx-auto" style="max-width: 800px;">
+        <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between align-items-center">
+            <span>Bảng chỉ số</span>
+            <span class="small opacity-75">Cập nhật: <span id="updatedAt">--:--:--</span></span>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:160px;">Nhóm</th>
+                            <th>Chỉ số</th>
+                            <th class="text-end" style="width:240px;">Giá trị (demo)</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <!-- SẴN SÀNG -->
+                        <tr>
+                            <td class="fw-bold text-primary text-center align-middle" rowspan="5">SẴN SÀNG</td>
+                            <td>MTTR [phút]</td>
+                            <td class="text-end fw-bold">@demo["MTTR"]</td>
+                        </tr>
+                        <tr>
+                            <td>MTBF [giờ]</td>
+                            <td class="text-end fw-bold">@demo["MTBF"]</td>
+                        </tr>
+                        <tr>
+                            <td>% Dừng máy [%]</td>
+                            <td class="text-end fw-bold">@demo["StopPct"]</td>
+                        </tr>
+                        <tr>
+                            <td>% Hỏng máy [%]</td>
+                            <td class="text-end fw-bold">@demo["FaultPct"]</td>
+                        </tr>
+                        <tr>
+                            <td>Availability Rate [%]</td>
+                            <td class="text-end fw-bold">@demo["A"]</td>
+                        </tr>
+
+                        <!-- ỔN ĐỊNH -->
+                        <tr>
+                            <td class="fw-bold text-primary text-center align-middle" rowspan="4">ỔN ĐỊNH</td>
+                            <td>Tổn thất tốc độ [%]</td>
+                            <td class="text-end fw-bold">@demo["SpeedLossPct"]</td>
+                        </tr>
+                        <tr>
+                            <td>Tốc độ trung bình [gói/phút]</td>
+                            <td class="text-end fw-bold">@demo["Vtb"]</td>
+                        </tr>
+                        <tr>
+                            <td>% Thời gian dừng nhỏ [%]</td>
+                            <td class="text-end fw-bold">@demo["MinorStopPct"]</td>
+                        </tr>
+                        <tr>
+                            <td>Performance Rate [%]</td>
+                            <td class="text-end fw-bold">@demo["P"]</td>
+                        </tr>
+
+                        <!-- CHẤT LƯỢNG -->
+                        <tr>
+                            <td class="fw-bold text-primary text-center align-middle" rowspan="3">CHẤT LƯỢNG</td>
+                            <td>% Gói cấn gia vị [%]</td>
+                            <td class="text-end fw-bold">@demo["SpicePct"]</td>
+                        </tr>
+                        <tr>
+                            <td>% Gói rỗng [%]</td>
+                            <td class="text-end fw-bold">@demo["EmptyPct"]</td>
+                        </tr>
+                        <tr>
+                            <td>Quality Rate [%]</td>
+                            <td class="text-end fw-bold">@demo["Q"]</td>
+                        </tr>
+
+                        <!-- HIỆU SUẤT -->
+                        <tr>
+                            <td class="fw-bold text-primary text-center align-middle" rowspan="3">HIỆU SUẤT</td>
+                            <td>% OEE 1 [%]</td>
+                            <td class="text-end fw-bold text-success">@demo["OEE1"]</td>
+                        </tr>
+                        <tr>
+                            <td>% OEE 2 [%]</td>
+                            <td class="text-end fw-bold text-success">@demo["OEE2"]</td>
+                        </tr>
+                        <tr>
+                            <td>% OEE 3 [%]</td>
+                            <td class="text-end fw-bold text-success">@demo["OEE3"]</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card-footer bg-white d-flex flex-wrap gap-2 justify-content-end">
+            <button type="button" class="btn btn-success">Xuất Excel</button>
+            <button type="button" class="btn btn-primary">In báo cáo</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function pad2(n){ return String(n).padStart(2,"0"); }
+        const d = new Date();
+        document.getElementById("updatedAt").textContent =
+            `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+    </script>
+}

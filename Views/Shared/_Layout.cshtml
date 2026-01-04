@@ -13,7 +13,10 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100" style="padding-top:70px;">
-
+    @{
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    }
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
         <div class="container-fluid px-4">
 
@@ -54,24 +57,26 @@
 
                         @* MENU CHÍNH *@
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Monitor" asp-action="Index">
+                            <a class="nav-link @(currentController == "Monitor" ? "active fw-bold" : "")"
+                            asp-controller="Monitor"
+                            asp-action="Index">
                                 Giám sát
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Report" asp-action="Index">
+                            <a class="nav-link @(currentController == "Report" ? "active fw-bold" : "")" asp-controller="Report" asp-action="Index">
                                 Lấy báo cáo
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Settings" asp-action="Index">
+                            <a class="nav-link @(currentController == "Settings" ? "active fw-bold" : "")" asp-controller="Settings" asp-action="Index">
                                 Cài đặt
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Products" asp-action="Index">
+                            <a class="nav-link @(currentController == "Products" ? "active fw-bold" : "")" asp-controller="Products" asp-action="Index">
                                 Sản phẩm
                             </a>
                         </li>
