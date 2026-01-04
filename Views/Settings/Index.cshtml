@@ -400,6 +400,106 @@
             loadProductionTable();
           });
     </script>
+    @*Auto0fill tên sản phẩm khi chọn mã sản phẩm cho trang cài đặt thông số*@
+    <script>
+        document.addEventListener("change", function(e){
+          if(e.target.id !== "paramSanPhamSelect") return;
+          const opt = e.target.options[e.target.selectedIndex];
+          const name = opt?.getAttribute("data-name") || "";
+          const input = document.getElementById("paramTenSanPham");
+          if(input) input.value = name;
+        });
+    </script>
+    @*Thiết lập, post jsson lên /Settings/SaveParameterSetting*@
+    <script>
+        function toIntOrNull(v){
+          const n = parseInt(v, 10);
+          return Number.isFinite(n) ? n : null;
+        }
+
+        document.getElementById("btnSaveParam")?.addEventListener("click", function(){
+          const caiDat = document.getElementById("rdCaiDat")?.checked ?? true;
+
+          const payload = {
+            caiDatThamSo: caiDat,
+            tenDayChuyen: document.getElementById("paramDayChuyen")?.value || "",
+            tenMay: document.getElementById("paramTenMay")?.value || "",
+            ca: document.getElementById("paramCa")?.value || "",
+
+            sanPhamId: toIntOrNull(document.getElementById("paramSanPhamSelect")?.value),
+
+            tocDoChuan: toIntOrNull(document.getElementById("paramTocDo")?.value),
+            thoiGianDungMay: toIntOrNull(document.getElementById("paramDungMay")?.value),
+            thoiGianChapNhanGoi: toIntOrNull(document.getElementById("paramChapNhan")?.value),
+            thoiGianGoiCan: toIntOrNull(document.getElementById("paramGoiCan")?.value),
+            thoiGianDayGoiCan: toIntOrNull(document.getElementById("paramDayGoiCan")?.value),
+            thoiGianCapNhatTuPLC: toIntOrNull(document.getElementById("paramCapNhatPLC")?.value)
+          };
+
+          if(!payload.tenDayChuyen) return alert("Nhập tên dây chuyền!");
+          if(!payload.tenMay) return alert("Nhập tên máy!");
+          if(!payload.ca) return alert("Chọn ca!");
+
+          fetch("/Settings/SaveParameterSetting", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          })
+          .then(async r=>{
+            const t = await r.text();
+            if(!r.ok) return alert("Lưu thất bại: " + t);
+            alert("Đã lưu thông số!");
+          })
+          .catch(err=>{
+            console.error(err);
+            alert("Lưu thất bại (JS)");
+          });
+        });
+    </script>
+    @*Tự load bản khi mới nhất và đổ lên form khi mở tab thông số*@
+    <script>
+        function loadLatestParam(){
+          fetch("/Settings/GetLatestParameterSetting")
+            .then(r=>r.json())
+            .then(d=>{
+              if(!d) return;
+
+              document.getElementById("rdCaiDat").checked = !!d.caiDatThamSo;
+              document.getElementById("rdKhongCaiDat").checked = !d.caiDatThamSo;
+
+              document.getElementById("paramDayChuyen").value = d.tenDayChuyen || "";
+              document.getElementById("paramTenMay").value = d.tenMay || "";
+              document.getElementById("paramCa").value = d.ca || "";
+
+              if(d.sanPhamId){
+                document.getElementById("paramSanPhamSelect").value = String(d.sanPhamId);
+                document.getElementById("paramSanPhamSelect")?.dispatchEvent(new Event("change"));
+              }
+
+              document.getElementById("paramTocDo").value = d.tocDoChuan ?? "";
+              document.getElementById("paramDungMay").value = d.thoiGianDungMay ?? "";
+              document.getElementById("paramChapNhan").value = d.thoiGianChapNhanGoi ?? "";
+              document.getElementById("paramGoiCan").value = d.thoiGianGoiCan ?? "";
+              document.getElementById("paramDayGoiCan").value = d.thoiGianDayGoiCan ?? "";
+              document.getElementById("paramCapNhatPLC").value = d.thoiGianCapNhatTuPLC ?? "";
+            })
+            .catch(console.error);
+        }
+
+        document.querySelector('button[data-bs-target="#parameter"]')
+          ?.addEventListener("shown.bs.tab", loadLatestParam);
+    </script>
+    @*JS auto-fill tên sản phẩm khi chọn mã sản phẩm*@
+    <script>
+        document.addEventListener("change", function(e){
+          if(e.target.id !== "paramSanPhamSelect") return;
+
+          const opt = e.target.options[e.target.selectedIndex];
+          const name = opt?.getAttribute("data-name") || "[ALL]";
+          const input = document.getElementById("paramTenSanPham");
+          if(input) input.value = name;
+        });
+    </script>
 
     <script src="~/js/general-setting.js"></script>
 

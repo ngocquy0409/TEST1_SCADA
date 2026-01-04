@@ -1,4 +1,8 @@
-﻿<div class="card shadow-sm border-primary">
+﻿@using TEST1_SCADA.Models
+@{
+    var sanPhams = ViewBag.SanPham as List<SanPham> ?? new List<SanPham>();
+}
+<div class="card shadow-sm border-primary">
     <div class="card-header bg-primary text-white fw-bold text-center">
         CÀI ĐẶT THÔNG SỐ
     </div>
@@ -6,13 +10,13 @@
 <div class="row justify-content-center">
     <div class="col-4 text-end fw-bold fs-5">
         <label>
-            <input type="radio" name="setting" checked>
+            <input type="radio" id="rdCaiDat" name="setting" checked>
             Cài Đặt Tham Số
         </label>
     </div>
     <div class="col-4 text-start fw-bold fs-5">
         <label>
-            <input type="radio" name="setting">
+            <input type="radio" id="rdKhongCaiDat" name="setting">
             Không Cài Đặt Tham Số
         </label>
     </div>
@@ -22,10 +26,10 @@
 
         <div class="row mb-2 align-items-center">
             <div class="col-4">
-                <label for="ten_day_chuyen" class="form-label fw-bold mb-0"> Tên dây chuyền </label>
+                <label for="paramDayChuyen" class="form-label fw-bold mb-0"> Tên dây chuyền </label>
             </div>
             <div class="col-8">
-                <select id="ten_day_chuyen" name="ten_day_chuyen" class="form-select form-select-sm">
+                <select id="paramDayChuyen" name="paramDayChuyen" class="form-select form-select-sm">
                     <option>Dây chuyền 1</option>
                     <option>Dây chuyền 2</option>
                     <option>Dây chuyền 3</option>
@@ -36,10 +40,10 @@
 
         <div class="row mb-2 align-items-center">
             <div class="col-4">
-                <label for="ten_may" class="form-label fw-bold mb-0"> Tên máy </label>
+                <label for="paramTenMay" class="form-label fw-bold mb-0"> Tên máy </label>
             </div>
             <div class="col-8">
-                <select id="ten_may" name="ten_may" class="form-select form-select-sm">
+                <select id="paramTenMay" name="paramTenMay" class="form-select form-select-sm">
                     <option>Máy 1</option>
                     <option>Máy 2</option>
                     <option>Máy 3</option>
@@ -50,10 +54,10 @@
 
         <div class="row mb-2 align-items-center">
             <div class="col-4">
-                <label for="ca" class="form-label fw-bold mb-0"> Ca </label>
+                <label for="paramCa" class="form-label fw-bold mb-0"> Ca </label>
             </div>
             <div class="col-8">
-                <select id="ca" name="ca" class="form-select form-select-sm">
+                <select id="paramCa" name="paramCa" class="form-select form-select-sm">
                     <option>Ca 1</option>
                     <option>Ca 2</option>
                     <option>Ca 3</option>
@@ -64,23 +68,25 @@
 
         <div class="row mb-2 align-items-center">
             <div class="col-4">
-                <label for="ma_san_pham" class="form-label fw-bold mb-0">Mã sản phẩm</label>
+                <label for="paramSanPhamSelect" class="form-label fw-bold mb-0">Mã sản phẩm</label>
             </div>
             <div class="col-8">
-                <select id="ma_san_pham" name="ma_san_pham" class="form-select form-select-sm">
+                <select id="paramSanPhamSelect" name="paramSanPhamSelect" class="form-select form-select-sm">
                     <option>[ALL]</option>
+                    @foreach (var sp in sanPhams)
+                    {
+                        <option value="@sp.Id" data-name="@sp.TenSanPham">@sp.MaSanPham</option>
+                    }
                 </select>
             </div>
         </div>
 
         <div class="row mb-2 align-items-center">
             <div class="col-4">
-                <label for="ten_san_pham" class="form-label fw-bold mb-0"> Tên sản phẩm </label>
+                <label for="paramTenSanPham" class="form-label fw-bold mb-0"> Tên sản phẩm </label>
             </div>
             <div class="col-8">
-                <select id="ten_san_pham" name="ten_san_pham" class="form-select form-select-sm">
-                    <option>[ALL]</option>
-                </select>
+                <input id="paramTenSanPham" name="paramTenSanPham" class="form-control" readonly value="[ALL]" />
             </div>
         </div>
     </div>
@@ -88,56 +94,56 @@
     <div class="border border-dark p-3 mb-3 bg-primary bg-opacity-10">
         <div class="row mb-2 align-items-center">
             <div class="col-5">
-                <label for="toc_do_chuan" class="form-label fw-bold mb-0">Tốc độ chuẩn [gói/phút]</label>
+                <label for="paramTocDo" class="form-label fw-bold mb-0">Tốc độ chuẩn [gói/phút]</label>
             </div>
             <div class="col-7">
-                <input type="text" id="toc_do_chuan" name="toc_do_chuan" class="form-control" placeholder="Nhập tốc độ chuẩn" />
+                <input type="text" id="paramTocDo" name="paramTocDo" class="form-control" placeholder="Nhập tốc độ chuẩn" />
             </div>
         </div>
 
         <div class="row mb-2 align-items-center">
             <div class="col-5">
-                <label for="dung_may" class="form-label fw-bold mb-0"> Thời gian dừng máy </label>
+                <label for="paramDungMay" class="form-label fw-bold mb-0"> Thời gian dừng máy </label>
             </div>
             <div class="col-7">
-                <input type="text" id="dung_may" name="dung_may" class="form-control" placeholder="Nhập thời gian dừng máy" />
+                <input type="text" id="paramDungMay" name="paramDungMay" class="form-control" placeholder="Nhập thời gian dừng máy" />
             </div>
         </div>
 
 
         <div class="row mb-2 align-items-center">
             <div class="col-5">
-                <label for="chap_nhan_goi" class="form-label fw-bold mb-0"> Thời gian chấp nhận gói [x0.1s] </label>
+                <label for="paramChapNhan" class="form-label fw-bold mb-0"> Thời gian chấp nhận gói [x0.1s] </label>
             </div>
             <div class="col-7">
-                <input type="text" id="chap_nhan_goi" name="chap_nhan_goi" class="form-control" placeholder="Nhập thời gian chấp nhận gói" />
+                <input type="text" id="paramChapNhan" name="paramChapNhan" class="form-control" placeholder="Nhập thời gian chấp nhận gói" />
             </div>
         </div>
 
         <div class="row mb-2 align-items-center">
             <div class="col-5">
-                <label for="goi_can" class="form-label fw-bold mb-0"> Thời gian gói cân [x0.1s] </label>
+                <label for="paramGoiCan" class="form-label fw-bold mb-0"> Thời gian gói cân [x0.1s] </label>
             </div>
             <div class="col-7">
-                <input type="text" id="goi_can" name="goi_can" class="form-control" placeholder="Nhập thời gian gói cân" />
+                <input type="text" id="paramGoiCan" name="paramGoiCan" class="form-control" placeholder="Nhập thời gian gói cân" />
             </div>
         </div>
 
         <div class="row mb-2 align-items-center">
             <div class="col-5">
-                <label for="day_goi" class="form-label fw-bold mb-0"> Thời gian đẩy gói cân [x0.1s]</label>
+                <label for="paramDayGoiCan" class="form-label fw-bold mb-0"> Thời gian đẩy gói cân [x0.1s]</label>
             </div>
             <div class="col-7">
-                <input type="text" id="day_goi" name="day_goi" class="form-control" placeholder="Nhập thời gian đẩy gói cân" />
+                <input type="text" id="paramDayGoiCan" name="paramDayGoiCan" class="form-control" placeholder="Nhập thời gian đẩy gói cân" />
             </div>
         </div>
 
         <div class="row mb-2 align-items-center">
             <div class="col-5">
-                <label for="cap_nhat" class="form-label fw-bold mb-0"> Thời gian cập nhật từ PLC [s]</label>
+                <label for="paramCapNhatPLC" class="form-label fw-bold mb-0"> Thời gian cập nhật từ PLC [s]</label>
             </div>
             <div class="col-7">
-                <input type="text" id="cap_nhat" name="cap_nhat" class="form-control" placeholder="Nhập thời gian cập nhật từ PLC" />
+                <input type="text" id="paramCapNhatPLC" name="paramCapNhatPLC" class="form-control" placeholder="Nhập thời gian cập nhật từ PLC" />
             </div>
         </div>
     </div>
@@ -146,13 +152,13 @@
 
 <!-- BUTTON -->
 <div class="text-center mb-3">
-    <button class="btn btn-success me-2 px-4">Thiết Lập</button>
-    <button class="btn btn-success px-4">Ghi Xuống</button>
+    <button type="button" id="btnSaveParam" class="btn btn-success me-2 px-4">Thiết Lập</button>
+    <button type="button" class="btn btn-success px-4">Ghi Xuống</button>
 </div>
 
 <!-- THOÁT -->
 <div class="text-center">
-    <button class="btn btn-warning px-5 fw-bold">Thoát</button>
+    <button type="button" class="btn btn-warning px-5 fw-bold">Thoát</button>
 </div>
 
 

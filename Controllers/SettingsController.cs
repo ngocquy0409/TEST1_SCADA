@@ -213,7 +213,82 @@ namespace TEST1_SCADA.Controllers
             return Json(list);
         }
 
+        // DTO để nhận JSON từ JS
+        public class SaveParameterSettingDto // DTO để nhận dữ liệu từ client
+        {
+            public bool CaiDatThamSo { get; set; }
 
+            public string TenDayChuyen { get; set; } = "";
+            public string TenMay { get; set; } = "";
+            public string Ca { get; set; } = "";
+
+            public int? SanPhamId { get; set; }
+            public int? TocDoChuan { get; set; }
+            public int? ThoiGianDungMay { get; set; }
+            public int? ThoiGianChapNhanGoi { get; set; }
+            public int? ThoiGianGoiCan { get; set; }
+            public int? ThoiGianDayGoiCan { get; set; }
+            public int? ThoiGianCapNhatTuPLC { get; set; }
+        }
+        // API lưu cấu hình tham số
+        [HttpPost]
+        public IActionResult SaveParameterSetting([FromBody] SaveParameterSettingDto dto)
+        {
+            if (dto == null) return BadRequest("DTO null");
+
+            SanPham? sp = null;
+            if (dto.SanPhamId.HasValue && dto.SanPhamId.Value > 0)
+                sp = _context.SanPham.FirstOrDefault(x => x.Id == dto.SanPhamId.Value);
+
+            var row = new ParameterSetting
+            {
+                CaiDatThamSo = dto.CaiDatThamSo,
+                TenDayChuyen = dto.TenDayChuyen ?? "",
+                TenMay = dto.TenMay ?? "",
+                Ca = dto.Ca ?? "",
+
+                SanPhamId = dto.SanPhamId,
+                MaSanPham = sp?.MaSanPham ?? "",
+                TenSanPham = sp?.TenSanPham ?? "",
+
+                TocDoChuan = dto.TocDoChuan,
+                ThoiGianDungMay = dto.ThoiGianDungMay,
+                ThoiGianChapNhanGoi = dto.ThoiGianChapNhanGoi,
+                ThoiGianGoiCan = dto.ThoiGianGoiCan,
+                ThoiGianDayGoiCan = dto.ThoiGianDayGoiCan,
+                ThoiGianCapNhatTuPLC = dto.ThoiGianCapNhatTuPLC,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.ParameterSettings.Add(row);
+            _context.SaveChanges();
+
+            return Ok(new { row.Id });
+        }
+        // kết thúc API lưu cấu hình tham số
+        // API lấy danh sách cấu hình tham số để hiển thị trong bảng
+        [HttpGet]
+        public IActionResult GetLatestParameterSetting()
+        {
+            var last = _context.ParameterSettings
+                .OrderByDescending(x => x.Id)
+                .Select(x => new {
+                    x.Id,
+                    x.CaiDatThamSo,
+                    x.TenDayChuyen,
+                    x.TenMay,
+                    x.Ca,
+                    x.SanPhamId,
+                    x.TocDoChuan,
+                    x.ThoiGianDungMay,
+                    x.ThoiGianChapNhanGoi,
+                    x.ThoiGianGoiCan,
+                    x.ThoiGianDayGoiCan,
+                    x.ThoiGianCapNhatTuPLC
+                })
+                .FirstOrDefault();
+
+            return Json(last);
+        }
     }
-
 }
