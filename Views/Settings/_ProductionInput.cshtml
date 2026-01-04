@@ -1,4 +1,8 @@
-﻿<div class="card shadow-sm border-primary">
+﻿@using TEST1_SCADA.Models
+@{
+    var sanPhams = ViewBag.SanPham as  List<SanPham>;
+}
+<div class="card shadow-sm border-primary">
     <div class="card-header bg-primary text-white fw-bold text-center">
         THÔNG TIN NHẬP KHO
     </div>
@@ -10,73 +14,101 @@
 
         <div class="row mb-2 align-items-center">
             <div class="col-5">
-                <label for="ngay_sx" class="form-label fw-bold mb-0"> Ngày sản xuất: </label>
+                <label for="ngaySanXuat" class="form-label fw-bold mb-0"> Ngày sản xuất: </label>
             </div>
             <div class="col-7">
-                <input type="date" id="ngay_sx" name="ngay_sx" class="form-control " />
+                <input type="date" id="ngaySanXuat" name="ngaySanXuat" class="form-control " />
             </div>
         </div>
 
         <div class="row mb-2 align-items-center">
             <div class="col-5">
-                <label for="ma_sp" class="form-label fw-bold mb-0"> Mã Sản Phẩm: </label>
+                <label for="sanPhamSelect" class="form-label fw-bold mb-0"> Mã Sản Phẩm: </label>
             </div>
             <div class="col-7">
-                <select id="ma_sp" name="ma_sp" class="form-select form-select-sm">
-                    <option>Mã 1</option>
-                    <option>Mã 2</option>
-                    <option>Mã 3</option>
-                    <option>Mã 4</option>
+                <select id="sanPhamSelect" name="sanPhamSelect" class="form-select form-select-sm">
+                    <option value="">[Chọn sản phẩm]</option>
+                    @foreach (var sp in sanPhams)
+                    {
+                        <option value="@sp.Id" data-name="@sp.TenSanPham">@sp.MaSanPham</option>
+                    }
                 </select>
             </div>
         </div>
 
         <div class="row mb-2 align-items-center">
             <div class="col-5">
-                <label for="ten_sp" class="form-label fw-bold mb-0"> Tên Sản Phẩm: </label>
+                <label for="tenSanPham" class="form-label fw-bold mb-0"> Tên Sản Phẩm: </label>
             </div>
             <div class="col-7">
-                <input type="text" id="ten_sp" name="ten_sp" class="form-control " />
+                <input id="tenSanPham" class="form-control " readonly/>
             </div>
         </div>
 
         <div class="row mb-2 align-items-center">
             <div class="col-5">
-                <label for="ca_sx" class="form-label fw-bold mb-0"> Ca Sản Xuất </label>
+                <label for="caSo" class="form-label fw-bold mb-0"> Ca Sản Xuất </label>
             </div>
             <div class="col-7">
-                <select id="ca_sx" name="ca_sx" class="form-select form-select-sm">
-                    <option>Ca 1</option>
-                    <option>Ca 2</option>
-                    <option>Ca 3</option>
-                    <option>Ca 4</option>
+                <select id="caSo" name= "caSo" class="form-select form-select-sm">
+                    <option value="1">Ca 1</option>
+                    <option value="2">Ca 2</option>
+                    <option value="3">Ca 3</option>
                 </select>
             </div>
         </div>
 
         <div class="row mb-2 align-items-center">
             <div class="col-5">
-                <label for="day_chuyen" class="form-label fw-bold mb-0"> Lựa chọn dây chuyền: </label>
+                <label for="dayChuyen" class="form-label fw-bold mb-0"> Lựa chọn dây chuyền: </label>
             </div>
             <div class="col-7">
-                <select id="day_chuyen" name="day_chuyen" class="form-select form-select-sm">
-                    <option>Line 1</option>
-                    <option>Line 2</option>
-                    <option>Line 3</option>
-                    <option>Line 4</option>
+                <select id="dayChuyen" name="dayChuyen" class="form-select form-select-sm">
+                    <option value="Line 1">Line 1</option>
+                    <option value="Line 2">Line 2</option>
+                    <option value="Line 3">Line 3</option>
+                    <option value="Line 4">Line 4</option>
+     
                 </select>
             </div>
         </div>
 
         <div class="row mb-2 align-items-center">
             <div class="col-5">
-                <label for="san_luong" class="form-label fw-bold mb-0"> Sản Lượng Thực: </label>
+                <label for="sanLuongThuc" class="form-label fw-bold mb-0"> Sản Lượng Thực: </label>
             </div>
             <div class="col-7">
-                <input type="text" id="san_luong" name="san_luong" class="form-control " />
+                <input type="text" id="sanLuongThuc" name="sanLuongThuc" class="form-control " />
             </div>
         </div>
-        
+        <div class="text-center">
+            <button type="button" id="btnSaveProduction" class="btn btn-primary px-4 me-5">Xác nhận</button>
+            <button type="button" class="btn btn-danger px-4">
+                Hủy
+            </button>
+        </div>
+        <hr class="my-4" />
+        <div class="text-center">
+            <h3>Thông tin lưu kho sản phẩm</h3>
+        </div>
+        <div class="table-responsive">
+            <div class="text-center">
+            <table class="table table-bordered table-sm align-middle" id="tblProduction">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:70px">ID</th>
+                        <th style="width:120px">Ngày</th>
+                        <th style="width:100px">Mã SP</th>
+                        <th>Tên SP</th>
+                        <th style="width:90px">Ca</th>
+                        <th style="width:110px">Line</th>
+                        <th style="width:110px">Sản lượng</th>  
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        </div>
 
     </div>
 </div>

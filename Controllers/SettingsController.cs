@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TEST1_SCADA.Data;
 using TEST1_SCADA.Models;
+using System.Linq; // để sử dụng LINQ trong truy vấn dữ liệu
 namespace TEST1_SCADA.Controllers
 {
     public class SettingsController : Controller
@@ -153,6 +154,66 @@ namespace TEST1_SCADA.Controllers
 
             return Json(data);
         }
+        
+        public class SaveProductionInputDto // DTO để nhận dữ liệu từ client
+        {
+            public DateTime NgaySanXuat { get; set; }
+            public int SanPhamId { get; set; }
+            public int CaSo { get; set; }
+            public string DayChuyen { get; set; } = "";
+            public int SanLuongThuc { get; set; }
+        }
+        // API lưu dữ liệu nhập sản xuất
+        [HttpPost]
+        public IActionResult SaveProductionInput([FromBody] SaveProductionInputDto? dto)
+        {
+            if (dto == null) return BadRequest("DTO null - sai JSON");
+            if (dto.SanPhamId <= 0) return BadRequest("Chưa chọn sản phẩm");
+            if (dto.CaSo < 1 || dto.CaSo > 3) return BadRequest("Ca không hợp lệ");
+            if (string.IsNullOrWhiteSpace(dto.DayChuyen)) return BadRequest("Chưa chọn dây chuyền");
+
+            var existsSp = _context.SanPham.Any(x => x.Id == dto.SanPhamId);
+            if (!existsSp) return BadRequest("SanPhamId không tồn tại trong DB");
+
+            var row = new ProductionInput
+            {
+                NgaySanXuat = dto.NgaySanXuat.Date,
+                SanPhamId = dto.SanPhamId,
+                CaSo = dto.CaSo,
+                DayChuyen = dto.DayChuyen,
+                SanLuongThuc = dto.SanLuongThuc,
+                CreatedAt = DateTime.Now
+            };
+
+            _context.ProductionInputs.Add(row);
+            _context.SaveChanges();
+            return Ok(new { ok = true, id = row.Id });
+        }
+        // kết thúc API lưu dữ liệu nhập sản xuất
+        // API lấy danh sách dữ liệu nhập sản xuất để hiển thị trong bảng
+        [HttpGet]
+        public IActionResult GetProductionInputs()
+        {
+            var list = (from p in _context.ProductionInputs
+                        join sp in _context.SanPham on p.SanPhamId equals sp.Id
+                        orderby p.Id descending
+                        select new
+                        {
+                            id = p.Id,
+                            ngaySanXuat = p.NgaySanXuat,
+                            maSanPham = sp.MaSanPham,
+                            tenSanPham = sp.TenSanPham,
+                            caSo = p.CaSo,
+                            dayChuyen = p.DayChuyen,
+                            sanLuongThuc = p.SanLuongThuc
+                        })
+                        .Take(200)
+                        .ToList();
+
+            return Json(list);
+        }
+
+
     }
 
 }

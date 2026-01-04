@@ -120,7 +120,7 @@
             .then(res => res.json())
             .then(data => {
                 @*cập nhật danh sách thả xuống cho cài đặt ca sản xuất *@
-                console.log("server trả về:", data); // phải thấy data.i
+                console.log("server trả về:", data); 
                 ["truongCaSelect1","truongCaSelect2","truongCaSelect3"].forEach(id=>{
                     const sel = document.getElementById(id);
                     if(!sel) return;
@@ -175,6 +175,34 @@
           const name = opt?.getAttribute("data-name") || "";
           const input = document.getElementById(inputId);
           if (input) input.value = name;
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          fetch('/Settings/GetShiftConfig')
+            .then(r => r.json())
+            .then(list => {
+              list.forEach(c => {
+                const ca = c.caSo ?? c.CaSo; // phòng trường hợp json trả PascalCase
+                const gio = c.gioBatDau ?? c.GioBatDau;
+                const phut = c.phutBatDau ?? c.PhutBatDau;
+                const tcId = c.truongCaId ?? c.TruongCaId;
+
+                // set giờ/phút nếu bạn có id gio1/phut1...
+                const gioEl = document.getElementById("gio" + ca);
+                const phutEl = document.getElementById("phut" + ca);
+                if (gioEl) gioEl.value = gio;
+                if (phutEl) phutEl.value = phut;
+
+                // set dropdown trưởng ca
+                const sel = document.getElementById("truongCaSelect" + ca);
+                if (sel) {
+                  sel.value = String(tcId);
+                  sel.dispatchEvent(new Event('change')); // ✅ bắt buộc để tự điền tên
+                }
+              });
+            })
+            .catch(err => console.error("Load ShiftConfig lỗi:", err));
         });
     </script>
 
@@ -237,6 +265,139 @@
               // trigger change để auto-fill tên
               document.getElementById("truongCaSelect" + c.caSo).dispatchEvent(new Event('change'));
             });
+          });
+    </script>
+    <script>
+        function fillNameForCa(caSo) {
+          const sel = document.getElementById("truongCaSelect" + caSo);
+          const input = document.getElementById("truongCaName" + caSo);
+          if (!sel || !input) return;
+
+          const opt = sel.options[sel.selectedIndex];
+          input.value = opt?.getAttribute("data-name") || "";
+        }
+
+        // Load config khi vào trang
+        document.addEventListener("DOMContentLoaded", function () {
+          fetch('/Settings/GetShiftConfig')
+            .then(r => r.json())
+            .then(list => {
+              list.forEach(c => {
+                const ca = c.caSo ?? c.CaSo;
+                const gio = c.gioBatDau ?? c.GioBatDau;
+                const phut = c.phutBatDau ?? c.PhutBatDau;
+                const tcId = c.truongCaId ?? c.TruongCaId;
+
+                const gioEl = document.getElementById("gio" + ca);
+                const phutEl = document.getElementById("phut" + ca);
+                if (gioEl) gioEl.value = String(gio);
+                if (phutEl) phutEl.value = String(phut).padStart(2, "0");
+
+                const sel = document.getElementById("truongCaSelect" + ca);
+                if (sel) sel.value = String(tcId);
+
+                // fill tên ngay (không phụ thuộc event)
+                fillNameForCa(ca);
+              });
+            })
+            .catch(err => console.error("GetShiftConfig lỗi:", err));
+        });
+    </script>
+
+    @*auto-fill tên sản phẩm khi chọn*@
+    <script>
+        document.addEventListener("change", function(e){
+          if(e.target.id !== "sanPhamSelect") return;
+          const opt = e.target.options[e.target.selectedIndex];
+          const name = opt?.getAttribute("data-name") || "";
+          document.getElementById("tenSanPham").value = name;
+        });
+    </script>
+    @*tự nhập khi load lại trang*@
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+          document.getElementById("sanPhamSelect")?.dispatchEvent(new Event("change"));
+        });
+    </script>
+
+    @*JS nút "Xác nhận" của trang "nhập sản lượng để lưu DB*@
+    <script>
+        document.getElementById("btnSaveProduction")?.addEventListener("click", function(){
+
+          const ngay = document.getElementById("ngaySanXuat").value; // input type="date"
+          const sanPhamId = parseInt(document.getElementById("sanPhamSelect").value || "0");
+          const caSo = Number(document.getElementById("caSo").value);
+          if (!Number.isFinite(caSo) || caSo <= 0) return alert("Chọn ca!");
+
+          const dayChuyen = document.getElementById("dayChuyen").value;
+          const sanLuong = parseInt(document.getElementById("sanLuongThuc").value || "0");
+
+          if(!ngay) return alert("Chọn ngày sản xuất!");
+          if(sanPhamId <= 0) return alert("Chọn mã sản phẩm!");
+          if(caSo <= 0) return alert("Chọn ca!");
+          if(!dayChuyen) return alert("Chọn dây chuyền!");
+
+          const payload = {
+            ngaySanXuat: ngay,
+            sanPhamId: sanPhamId,
+            caSo: caSo,
+            dayChuyen: dayChuyen,
+            sanLuongThuc: sanLuong
+          };
+
+          fetch("/Settings/SaveProductionInput", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+            })
+
+          .then(async r=>{
+            const text = await r.text();
+            if(!r.ok) return alert("Lưu thất bại: " + text);
+            alert("Đã lưu nhập sản lượng!");
+            loadProductionTable();
+          })
+          .catch(err=>{
+            console.error(err);
+            alert("Lưu thất bại (JS)");
+          });
+        });
+    </script>
+    @*Load bảng khi mở trang và reload bảng sau khi lưu*@
+    <script>
+        function loadProductionTable(){
+          fetch("/Settings/GetProductionInputs")
+            .then(r => r.json())
+            .then(list => {
+              const tb = document.querySelector("#tblProduction tbody");
+              if(!tb) return;
+
+              tb.innerHTML = "";
+
+              list.forEach(x => {
+                const date = new Date(x.ngaySanXuat).toLocaleDateString("vi-VN");
+                tb.insertAdjacentHTML("beforeend", `
+                  <tr>
+                    <td>${x.id}</td>
+                    <td>${date}</td>
+                    <td>${x.maSanPham}</td>
+                    <td>${x.tenSanPham}</td>
+                    <td>Ca ${x.caSo}</td>
+                    <td>${x.dayChuyen}</td>
+                    <td>${x.sanLuongThuc}</td>
+                  </tr>
+                `);
+              });
+            })
+            .catch(err => console.error("loadProductionTable error:", err));
+        }
+
+        document.addEventListener("DOMContentLoaded", loadProductionTable);
+    </script>
+    <script>
+        document.querySelector('button[data-bs-target="#production"]')
+          ?.addEventListener("shown.bs.tab", function () {
+            loadProductionTable();
           });
     </script>
 

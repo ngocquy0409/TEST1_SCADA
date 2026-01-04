@@ -1,4 +1,4 @@
-html {
+﻿html {
   font-size: 14px;
 }
 
@@ -23,4 +23,23 @@ body {
 /* highlight row selected */
 tr.selected {
     background-color: #ffeeba !important;
+}
+/* Không cho bảng/input tràn ra ngoài khi zoom */
+.table-responsive {
+    overflow-x: auto;
+}
+
+input, select, textarea {
+    max-width: 100%;
+}
+
+/* Giới hạn chiều rộng khu vực chính cho dễ nhìn */
+.page-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Nút không bị lệch khi hẹp */
+.btn {
+    white-space: nowrap;
 }
