@@ -12,6 +12,7 @@ namespace TEST1_SCADA.Data
         public DbSet<TruongCa> TruongCa { get; set; } // bảng trưởng ca 
 
         public DbSet<SanPham> SanPham { get; set; }
+
         public DbSet<ShiftConfig> ShiftConfigs { get; set; } = default!;
 
         public DbSet<ProductionInput> ProductionInputs { get; set; } = default!;
