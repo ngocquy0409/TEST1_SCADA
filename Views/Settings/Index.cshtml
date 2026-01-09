@@ -538,7 +538,7 @@
           alert(data?.message || "OK");
         });
     </script>
-    @*Xử lý nút nhấn cho PLC*@
+    @*Xử lý nút nhấn để ghi dữ liệu xuống cho PLC*@
     <script>
         document.getElementById("btnConnectPlc")?.addEventListener("click", function () {
           fetch("/Plc/Connect", { method: "POST" })

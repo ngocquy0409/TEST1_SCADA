@@ -18,5 +18,7 @@ namespace TEST1_SCADA.Data
         public DbSet<ProductionInput> ProductionInputs { get; set; } = default!;
 
         public DbSet<ParameterSetting> ParameterSettings { get; set; } // bảng lưu thông số người dùng nhập vào
+
+        public DbSet<MonitorData> MonitorData { get; set; } // bảng lưu dữ liệu giám sát từ PLC
     }
 }
