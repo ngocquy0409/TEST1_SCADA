@@ -71,62 +71,6 @@
     }
 </style>
 
-
-<div id="homecontainer">
-
-    <!-- WRITE DATA -->
-    <div class="item">
-        <h4>Ghi dữ liệu</h4>
-
-        <table class="data-table">
-            <tr>
-                <td>B1</td>
-                <td><input id="B1" type="number" class="scada-input" /></td>
-            </tr>
-            <tr>
-                <td>B2</td>
-                <td><input id="B2" type="number" class="scada-input" /></td>
-            </tr>
-            <tr>
-                <td>B3</td>
-                <td><input id="B3" type="number" class="scada-input" /></td>
-            </tr>
-        </table>
-
-        <button id="DataWriting" type="button" class="btn btn-primary">
-            Ghi dữ liệu
-        </button>
-    </div>
-
-    <!-- READ DATA -->
-    <div class="item">
-        <h4>Đọc dữ liệu</h4>
-
-        <table class="data-table">
-            <tr>
-                <td>A1</td>
-                <td><input id="A1" type="number" class="scada-input" disabled /></td>
-            </tr>
-            <tr>
-                <td>A2</td>
-                <td><input id="A2" type="number" class="scada-input" disabled /></td>
-            </tr>
-            <tr>
-                <td>A3</td>
-                <td><input id="A3" type="number" class="scada-input" disabled /></td>
-            </tr>
-        </table>
-
-        <button id="connect" type="button" class="btn btn-primary">
-            Kết nối
-        </button>
-
-        <div id="connectionStatus" class="status status-disconnected">
-            Disconnected
-        </div>
-    </div>
-
-</div>
 <div class="container-fluid py-3" style="background:#eef6ff; min-height: calc(100vh - 120px);">
     <!-- TOP -->
     <div class="row g-3 align-items-stretch">
@@ -291,7 +235,7 @@
         // CONNECT
         $('#connect').click(function () {
             $.ajax({
-                url: '/Monitor/Connect',
+                url: '/Plc/Connect',
                 type: 'POST',
                 success: function (response) {
                     $('#connectionStatus')
@@ -307,69 +251,7 @@
             });
         });
 
-        // WRITE DATA
-        $('#DataWriting').click(function () {
-
-            if (isWriting) return;
-            isWriting = true;
-
-            let b1 = Number($('#B1').val());
-            let b2 = Number($('#B2').val());
-            let b3 = Number($('#B3').val());
-
-            if (isNaN(b1) || isNaN(b2) || isNaN(b3)) {
-                alert('Vui lòng nhập số hợp lệ');
-                isWriting = false;
-                return;
-            }
-
-            $.ajax({
-                url: '/Monitor/DataWriting',
-                type: 'POST',
-                data: { B1: b1, B2: b2, B3: b3 },
-                success: function (response) {
-                    if (response.success) {
-                        alert('Ghi dữ liệu thành công!');
-                    } else {
-                        alert('Lỗi: ' + response.message);
-                    }
-                },
-                error: function () {
-                    alert('Lỗi gửi dữ liệu');
-                },
-                complete: function () {
-                    isWriting = false;
-                }
-            });
-        });
-
-        // READ DATA
-        function updateData() {
-            $.ajax({
-                url: '/Monitor/DataReading',
-                type: 'GET',
-                    success: function (response) {
-                        if (response.success) {
-                            $('#A1').val(response.a1);
-                            $('#A2').val(response.a2);
-                            $('#A3').val(response.a3);
-                        } else {
-                            console.error(response.message);
-                            $('#connectionStatus')
-                                .text(response.message)
-                                .removeClass('status-connected')
-                                .addClass('status-disconnected');
-                        }
-                    },
-                    error: function (err) {
-                        console.error(err);
-                    }
-
-            });
-        }
-
-        setInterval(updateData, 500);
-    });
+        
 </script>
 
 @section Scripts {

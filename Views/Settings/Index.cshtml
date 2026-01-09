@@ -500,6 +500,70 @@
           if(input) input.value = name;
         });
     </script>
+    @*JS cho nút "Ghi xuống" cho tab thông số*@
+    <script>
+        function lastNumber(text) {
+          const m = (text || "").match(/(\d+)/g);
+          if (!m) return 0;
+          return parseInt(m[m.length - 1], 10) || 0;
+        }
+
+        document.getElementById("btnWritePlc")?.addEventListener("click", async function (e) {
+          e.preventDefault();
+
+          const payload = {
+            tocDoChuan: parseInt(document.getElementById("paramTocDo").value || "0", 10),
+            thoiGianDungMay: parseInt(document.getElementById("paramDungMay").value || "0", 10),
+            chapNhanGoi_x01s: parseInt(document.getElementById("paramChapNhan").value || "0", 10),
+            goiCan_x01s: parseInt(document.getElementById("paramGoiCan").value || "0", 10),
+            dayGoiCan_x01s: parseInt(document.getElementById("paramDayGoiCan").value || "0", 10),
+            capNhatTuPLC_s: parseInt(document.getElementById("paramCapNhatPLC").value || "0", 10),
+
+            caSo: lastNumber(document.getElementById("paramCa").value),
+            dayChuyen: lastNumber(document.getElementById("paramDayChuyen").value),
+            may: lastNumber(document.getElementById("paramTenMay").value),
+
+            sanPhamId: parseInt(document.getElementById("paramSanPhamSelect").value || "0", 10)
+          };
+
+          const r = await fetch("/Plc/WriteParameters", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await r.json().catch(()=>null);
+          if (!r.ok) return alert("Ghi PLC thất bại: " + (data?.message || "Unknown"));
+
+          alert(data?.message || "OK");
+        });
+    </script>
+    @*Xử lý nút nhấn cho PLC*@
+    <script>
+        document.getElementById("btnConnectPlc")?.addEventListener("click", function () {
+          fetch("/Plc/Connect", { method: "POST" })
+            .then(r => r.json())
+            .then(data => {
+              const st = document.getElementById("plcStatus");
+              if (!st) return;
+
+              // data.status là chuỗi bạn đang return từ controller
+              st.textContent = data.status || "Unknown";
+              const ok = (data.status || "").toLowerCase().includes("thành công");
+              st.classList.toggle("text-success", ok);
+              st.classList.toggle("text-danger", !ok);
+            })
+            .catch(err => {
+              console.error(err);
+              const st = document.getElementById("plcStatus");
+              if (st) {
+                st.textContent = "Lỗi kết nối PLC!";
+                st.classList.add("text-danger");
+                st.classList.remove("text-success");
+              }
+            });
+        });
+    </script>
 
     <script src="~/js/general-setting.js"></script>
 
