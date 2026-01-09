@@ -12,8 +12,8 @@ using TEST1_SCADA.Data;
 namespace TEST1_SCADA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260109154915_AddMonitorData")]
-    partial class AddMonitorData
+    [Migration("20260109172140_AddMonitorData2")]
+    partial class AddMonitorData2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -227,27 +227,23 @@ namespace TEST1_SCADA.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TEST1_SCADA.Models.MonitorData", b =>
+            modelBuilder.Entity("TEST1_SCADA.Models.MonitorData2", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Ca")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DayChuyen")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Empty")
                         .HasColumnType("int");
 
-                    b.Property<float>("EmptyPct")
-                        .HasColumnType("real");
+                    b.Property<int>("EmptyPct")
+                        .HasColumnType("int");
 
                     b.Property<int>("Good")
                         .HasColumnType("int");
@@ -263,12 +259,14 @@ namespace TEST1_SCADA.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("May")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Oee")
+                        .HasColumnType("int");
 
-                    b.Property<float>("OEE")
-                        .HasColumnType("real");
+                    b.Property<int?>("SanPhamId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Speed")
+                        .HasColumnType("int");
 
                     b.Property<int>("Stop5m")
                         .HasColumnType("int");
@@ -276,18 +274,31 @@ namespace TEST1_SCADA.Migrations
                     b.Property<int>("Stop5s")
                         .HasColumnType("int");
 
+                    b.Property<string>("TenDayChuyen")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenMay")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenSanPham")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TenTruongCa")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("TimeStamp")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("TocDo")
-                        .HasColumnType("int");
 
                     b.Property<int>("Total")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("MonitorData");
+                    b.ToTable("MonitorDatas");
                 });
 
             modelBuilder.Entity("TEST1_SCADA.Models.ParameterSetting", b =>

@@ -6,28 +6,31 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TEST1_SCADA.Migrations
 {
     /// <inheritdoc />
-    public partial class AddMonitorData : Migration
+    public partial class AddMonitorData2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "MonitorData",
+                name: "MonitorDatas",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TimeStamp = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DayChuyen = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    May = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TenDayChuyen = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TenMay = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Ca = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MaTruongCa = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SanPhamId = table.Column<int>(type: "int", nullable: true),
                     MaSanPham = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TocDo = table.Column<int>(type: "int", nullable: false),
-                    OEE = table.Column<float>(type: "real", nullable: false),
+                    TenSanPham = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MaTruongCa = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TenTruongCa = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Speed = table.Column<int>(type: "int", nullable: false),
+                    Oee = table.Column<int>(type: "int", nullable: false),
                     Stop5s = table.Column<int>(type: "int", nullable: false),
                     Stop5m = table.Column<int>(type: "int", nullable: false),
-                    EmptyPct = table.Column<float>(type: "real", nullable: false),
+                    EmptyPct = table.Column<int>(type: "int", nullable: false),
                     Total = table.Column<int>(type: "int", nullable: false),
                     Good = table.Column<int>(type: "int", nullable: false),
                     Jam = table.Column<int>(type: "int", nullable: false),
@@ -35,7 +38,7 @@ namespace TEST1_SCADA.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MonitorData", x => x.Id);
+                    table.PrimaryKey("PK_MonitorDatas", x => x.Id);
                 });
         }
 
@@ -43,7 +46,7 @@ namespace TEST1_SCADA.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "MonitorData");
+                name: "MonitorDatas");
         }
     }
 }

@@ -9,7 +9,6 @@
 
         public string TenMay { get; set; } = "";
         public string Ca { get; set; } = "";
-
         public int? SanPhamId { get; set; }      // chọn theo mã SP
         public string MaSanPham { get; set; } = "";
         public string TenSanPham { get; set; } = "";

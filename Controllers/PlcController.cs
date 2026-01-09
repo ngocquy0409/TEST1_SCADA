@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using S7.Net;
+using TEST1_SCADA.Data;
 using TEST1_SCADA.Models;
 
 namespace TEST1_SCADA.Controllers
@@ -73,5 +74,7 @@ namespace TEST1_SCADA.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
+       
+
     }
 }

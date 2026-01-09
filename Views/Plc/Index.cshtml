@@ -1,9 +1,8 @@
-﻿@model TEST1_SCADA.Models.WriteData
+﻿@model TEST1_SCADA.Models.PlcParameterWrite
 
 @{
     ViewData["Title"] = "Giám sát";
 }
-
 
 <style>
     #homecontainer {
@@ -20,7 +19,6 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
-    /* Modern table style */
     .data-table {
         width: 100%;
         border-collapse: separate;
@@ -91,9 +89,49 @@
                         </select>
                     </div>
 
+                    <!-- ✅ thêm chọn máy -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Chọn máy</label>
+                        <select id="machineSelect" class="form-select">
+                            <option value="1">Máy 1</option>
+                            <option value="2">Máy 2</option>
+                            <option value="3">Máy 3</option>
+                            <option value="4">Máy 4</option>
+                        </select>
+                    </div>
+
+                    <!-- ✅ thêm chọn ca -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Chọn ca</label>
+                        <select id="shiftSelect" class="form-select">
+                            <option value="Ca 1">Ca 1</option>
+                            <option value="Ca 2">Ca 2</option>
+                            <option value="Ca 3">Ca 3</option>
+                        </select>
+                    </div>
+
                     <div class="d-flex align-items-center gap-2">
                         <span class="fw-bold">Ca làm việc:</span>
                         <span id="shiftText" class="badge bg-info text-dark px-3 py-2">Ca 1</span>
+
+                        <span class="ms-auto small text-muted">
+                            Update: <span id="updatedAt">--:--:--</span>
+                        </span>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="button" id="btnStart" class="btn btn-success w-50">Start</button>
+                        <button type="button" id="btnStop" class="btn btn-outline-danger w-50" disabled>Stop</button>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label fw-bold">Chu kỳ đọc (ms)</label>
+                        <input id="pollMs" type="number" class="form-control" value="1000" min="200" step="100" />
+                    </div>
+
+                    <div class="mt-3">
+                        <span class="fw-bold">Trạng thái:</span>
+                        <span id="connStatus" class="badge bg-danger">Disconnected</span>
                     </div>
                 </div>
             </div>
@@ -224,64 +262,132 @@
         }
     </div>
 </div>
-<!-- ===================== SCRIPT ===================== -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-    $(document).ready(function () {
-
-        let isWriting = false;
-
-        // CONNECT
-        $('#connect').click(function () {
-            $.ajax({
-                url: '/Plc/Connect',
-                type: 'POST',
-                success: function (response) {
-                    $('#connectionStatus')
-                        .text('Connected')
-                        .removeClass('status-disconnected')
-                        .addClass('status-connected');
-
-                    alert(response.status);
-                },
-                error: function () {
-                    alert('Không kết nối được server');
-                }
-            });
-        });
-
-        
-</script>
 
 @section Scripts {
     <script>
-        // demo data (để bạn thấy UI chạy). Sau này thay bằng fetch API.
-        function fillDemo(line){
-          document.getElementById("lineTitle").textContent = "Dây chuyền " + line;
-          document.getElementById("shiftText").textContent = "Ca 1";
+        (() => {
+          let timer = null;
 
-          document.getElementById("leaderName").textContent = "Nguyễn Văn A";
-          document.getElementById("leaderCode").textContent = "TC01";
-          document.getElementById("productName").textContent = "Bánh mì";
-          document.getElementById("productCode").textContent = "SP01";
-
-          for(let i=1;i<=4;i++){
-            document.getElementById(`m${i}_speed`).value = 120 + i;
-            document.getElementById(`m${i}_oee`).value = (85 + i) + "%";
-            document.getElementById(`m${i}_stop5s`).value = 2*i;
-            document.getElementById(`m${i}_stop5m`).value = i;
-            document.getElementById(`m${i}_emptyPct`).value = (1.2*i).toFixed(1) + "%";
-            document.getElementById(`m${i}_total`).value = 1000*i;
-            document.getElementById(`m${i}_good`).value = 980*i;
-            document.getElementById(`m${i}_jam`).value = 10*i;
-            document.getElementById(`m${i}_empty`).value = 10*i;
+          function pad2(n){ return String(n).padStart(2,"0"); }
+          function setUpdatedAt() {
+            const d = new Date();
+            document.getElementById("updatedAt").textContent =
+              `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
           }
-        }
 
-        document.getElementById("lineSelect").addEventListener("change", function(){
-          fillDemo(this.value);
-        });
-        fillDemo(document.getElementById("lineSelect").value);
+          function getFilters(){
+            return {
+              line: document.getElementById("lineSelect").value,
+              machine: document.getElementById("machineSelect").value,
+              ca: document.getElementById("shiftSelect").value
+            };
+          }
+
+          function setConn(ok){
+            const el = document.getElementById("connStatus");
+            if(ok){
+              el.textContent = "Connected";
+              el.className = "badge bg-success";
+            }else{
+              el.textContent = "Disconnected";
+              el.className = "badge bg-danger";
+            }
+          }
+
+          async function loadContext(){
+            const f = getFilters();
+
+            document.getElementById("lineTitle").textContent = `Dây chuyền ${f.line}`;
+            document.getElementById("shiftText").textContent = f.ca;
+
+            const r = await fetch(`/monitor/context?line=${encodeURIComponent(f.line)}&machine=${encodeURIComponent(f.machine)}&ca=${encodeURIComponent(f.ca)}`);
+            const data = await r.json();
+
+            if(!data || data.success !== true){
+              document.getElementById("leaderName").textContent = "---";
+              document.getElementById("leaderCode").textContent = "---";
+              document.getElementById("productName").textContent = "---";
+              document.getElementById("productCode").textContent = "---";
+              return;
+            }
+
+            document.getElementById("leaderName").textContent = data.tenTruongCa || "---";
+            document.getElementById("leaderCode").textContent = data.maTruongCa || "---";
+            document.getElementById("productName").textContent = data.tenSanPham || "---";
+            document.getElementById("productCode").textContent = data.maSanPham || "---";
+          }
+
+          function fillOneMachine(machineIndex, m){
+            document.getElementById(`m${machineIndex}_speed`).value = m.speed ?? "";
+            document.getElementById(`m${machineIndex}_oee`).value = m.oee ?? "";
+            document.getElementById(`m${machineIndex}_stop5s`).value = m.stop5s ?? "";
+            document.getElementById(`m${machineIndex}_stop5m`).value = m.stop5m ?? "";
+            document.getElementById(`m${machineIndex}_emptyPct`).value = m.emptyPct ?? "";
+            document.getElementById(`m${machineIndex}_total`).value = m.total ?? "";
+            document.getElementById(`m${machineIndex}_good`).value = m.good ?? "";
+            document.getElementById(`m${machineIndex}_jam`).value = m.jam ?? "";
+            document.getElementById(`m${machineIndex}_empty`).value = m.empty ?? "";
+          }
+
+          async function pollOnce(){
+            const f = getFilters();
+            const r = await fetch(`/monitor/read-save?line=${encodeURIComponent(f.line)}&machine=${encodeURIComponent(f.machine)}&ca=${encodeURIComponent(f.ca)}`);
+            const data = await r.json();
+
+            if(!data || data.success !== true){
+              setConn(false);
+              return;
+            }
+
+            setConn(true);
+            setUpdatedAt();
+
+            // fill lại context (nếu server trả kèm)
+            if(data.context){
+              document.getElementById("leaderName").textContent = data.context.tenTruongCa || "---";
+              document.getElementById("leaderCode").textContent = data.context.maTruongCa || "---";
+              document.getElementById("productName").textContent = data.context.tenSanPham || "---";
+              document.getElementById("productCode").textContent = data.context.maSanPham || "---";
+            }
+
+            // chỉ fill máy đang chọn
+            const mi = parseInt(f.machine);
+            fillOneMachine(mi, data.machineData || {});
+          }
+
+          function start(){
+            stop();
+            document.getElementById("btnStart").disabled = true;
+            document.getElementById("btnStop").disabled = false;
+
+            const ms = Math.max(200, parseInt(document.getElementById("pollMs").value || "1000"));
+            pollOnce();
+            timer = setInterval(pollOnce, ms);
+          }
+
+          function stop(){
+            if(timer){
+              clearInterval(timer);
+              timer = null;
+            }
+            document.getElementById("btnStart").disabled = false;
+            document.getElementById("btnStop").disabled = true;
+          }
+
+          document.getElementById("btnStart").addEventListener("click", start);
+          document.getElementById("btnStop").addEventListener("click", stop);
+
+          // đổi selection => load lại context, nếu đang chạy thì poll lại
+          ["lineSelect","machineSelect","shiftSelect"].forEach(id=>{
+            document.getElementById(id).addEventListener("change", async ()=>{
+              await loadContext();
+              if(timer) pollOnce();
+            });
+          });
+
+          // init
+          setConn(false);
+          loadContext();
+        })();
     </script>
 }
