@@ -71,13 +71,15 @@
 
 <div class="container-fluid py-3" style="background:#eef6ff; min-height: calc(100vh - 120px);">
     <!-- TOP -->
-    <div class="row g-3 align-items-stretch">
+    <!-- TOP -->
+    <div class="row g-3 align-items-start">
         <!-- Left control -->
         <div class="col-12 col-lg-4">
-            <div class="card shadow-sm border-primary h-100">
+            <div class="card shadow-sm border-primary">
                 <div class="card-header bg-primary text-white fw-bold">
                     Chọn hiển thị
                 </div>
+
                 <div class="card-body">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Chọn dây chuyền hiển thị</label>
@@ -89,7 +91,6 @@
                         </select>
                     </div>
 
-                    <!-- ✅ thêm chọn máy -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">Chọn máy</label>
                         <select id="machineSelect" class="form-select">
@@ -100,7 +101,6 @@
                         </select>
                     </div>
 
-                    <!-- ✅ thêm chọn ca -->
                     <div class="mb-3">
                         <label class="form-label fw-bold">Chọn ca</label>
                         <select id="shiftSelect" class="form-select">
@@ -137,16 +137,18 @@
             </div>
         </div>
 
-        <!-- Middle info -->
+        <!-- Right info -->
         <div class="col-12 col-lg-8">
-            <div class="card shadow-sm border-primary h-100">
+            <div class="card shadow-sm border-primary">
                 <div class="card-header bg-primary text-white fw-bold">
                     Thông tin đang chạy
                 </div>
+
                 <div class="card-body">
+                    <!-- 2 box thông tin -->
                     <div class="row g-2">
                         <div class="col-12 col-md-6">
-                            <div class="p-3 rounded border bg-white">
+                            <div class="p-3 rounded border bg-white h-100">
                                 <div class="d-flex justify-content-between">
                                     <span class="fw-bold">Tên trưởng ca:</span>
                                     <span id="leaderName" class="text-primary fw-semibold">---</span>
@@ -160,7 +162,7 @@
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <div class="p-3 rounded border bg-white">
+                            <div class="p-3 rounded border bg-white h-100">
                                 <div class="d-flex justify-content-between">
                                     <span class="fw-bold">Tên sản phẩm:</span>
                                     <span id="productName" class="text-primary fw-semibold">---</span>
@@ -174,15 +176,44 @@
                         </div>
                     </div>
 
-                    <div class="text-center mt-3">
-                        <span id="lineTitle" class="badge bg-primary fs-6 px-4 py-2">
-                            Dây chuyền 1
-                        </span>
+                    <!-- Tóm tắt đang chọn + nút dây chuyền để lấp trống -->
+                    <div class="row g-2 mt-2">
+                        <div class="col-12 col-md-8">
+                            <div class="p-3 rounded border bg-white">
+                                <div class="d-flex flex-wrap gap-3 align-items-center">
+                                    <div>
+                                        <div class="small text-muted">Đang chọn</div>
+                                        <div class="fw-bold">
+                                            <span id="lineTitleText">Dây chuyền 1</span> ·
+                                            <span id="machineTitleText">Máy 1</span> ·
+                                            <span id="shiftTitleText">Ca 1</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="ms-auto">
+                                        <div class="small text-muted">Kết nối</div>
+                                        <div>
+                                            <span class="badge bg-secondary" id="connBadgeRight">---</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-4 d-flex align-items-stretch">
+                            <div class="w-100 p-3 rounded border bg-white d-flex justify-content-center align-items-center">
+                                <span id="lineTitle" class="badge bg-primary fs-6 px-4 py-2">
+                                    Dây chuyền 1
+                                </span>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- MACHINES -->
     <div class="row g-3 mt-1">
@@ -262,132 +293,45 @@
         }
     </div>
 </div>
-
 @section Scripts {
+    @*Đồng bộ dữ liệu ở khung bên trái và bên phải*@
     <script>
-        (() => {
-          let timer = null;
+        function syncTopTitles(){
+          const line = document.getElementById("lineSelect")?.value || "1";
+          const machine = document.getElementById("machineSelect")?.value || "1";
+          const ca = document.getElementById("shiftSelect")?.value || "Ca 1";
 
-          function pad2(n){ return String(n).padStart(2,"0"); }
-          function setUpdatedAt() {
-            const d = new Date();
-            document.getElementById("updatedAt").textContent =
-              `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
-          }
+          const lineText = "Dây chuyền " + line;
+          const machineText = "Máy " + machine;
 
-          function getFilters(){
-            return {
-              line: document.getElementById("lineSelect").value,
-              machine: document.getElementById("machineSelect").value,
-              ca: document.getElementById("shiftSelect").value
-            };
-          }
+          const lt = document.getElementById("lineTitleText");
+          const mt = document.getElementById("machineTitleText");
+          const st = document.getElementById("shiftTitleText");
+          if(lt) lt.textContent = lineText;
+          if(mt) mt.textContent = machineText;
+          if(st) st.textContent = ca;
 
-          function setConn(ok){
-            const el = document.getElementById("connStatus");
-            if(ok){
-              el.textContent = "Connected";
-              el.className = "badge bg-success";
-            }else{
-              el.textContent = "Disconnected";
-              el.className = "badge bg-danger";
-            }
-          }
+          const lineBadge = document.getElementById("lineTitle");
+          if(lineBadge) lineBadge.textContent = lineText;
 
-          async function loadContext(){
-            const f = getFilters();
+          const shiftText = document.getElementById("shiftText");
+          if(shiftText) shiftText.textContent = ca;
+        }
 
-            document.getElementById("lineTitle").textContent = `Dây chuyền ${f.line}`;
-            document.getElementById("shiftText").textContent = f.ca;
-
-            const r = await fetch(`/monitor/context?line=${encodeURIComponent(f.line)}&machine=${encodeURIComponent(f.machine)}&ca=${encodeURIComponent(f.ca)}`);
-            const data = await r.json();
-
-            if(!data || data.success !== true){
-              document.getElementById("leaderName").textContent = "---";
-              document.getElementById("leaderCode").textContent = "---";
-              document.getElementById("productName").textContent = "---";
-              document.getElementById("productCode").textContent = "---";
-              return;
-            }
-
-            document.getElementById("leaderName").textContent = data.tenTruongCa || "---";
-            document.getElementById("leaderCode").textContent = data.maTruongCa || "---";
-            document.getElementById("productName").textContent = data.tenSanPham || "---";
-            document.getElementById("productCode").textContent = data.maSanPham || "---";
-          }
-
-          function fillOneMachine(machineIndex, m){
-            document.getElementById(`m${machineIndex}_speed`).value = m.speed ?? "";
-            document.getElementById(`m${machineIndex}_oee`).value = m.oee ?? "";
-            document.getElementById(`m${machineIndex}_stop5s`).value = m.stop5s ?? "";
-            document.getElementById(`m${machineIndex}_stop5m`).value = m.stop5m ?? "";
-            document.getElementById(`m${machineIndex}_emptyPct`).value = m.emptyPct ?? "";
-            document.getElementById(`m${machineIndex}_total`).value = m.total ?? "";
-            document.getElementById(`m${machineIndex}_good`).value = m.good ?? "";
-            document.getElementById(`m${machineIndex}_jam`).value = m.jam ?? "";
-            document.getElementById(`m${machineIndex}_empty`).value = m.empty ?? "";
-          }
-
-          async function pollOnce(){
-            const f = getFilters();
-            const r = await fetch(`/monitor/read-save?line=${encodeURIComponent(f.line)}&machine=${encodeURIComponent(f.machine)}&ca=${encodeURIComponent(f.ca)}`);
-            const data = await r.json();
-
-            if(!data || data.success !== true){
-              setConn(false);
-              return;
-            }
-
-            setConn(true);
-            setUpdatedAt();
-
-            // fill lại context (nếu server trả kèm)
-            if(data.context){
-              document.getElementById("leaderName").textContent = data.context.tenTruongCa || "---";
-              document.getElementById("leaderCode").textContent = data.context.maTruongCa || "---";
-              document.getElementById("productName").textContent = data.context.tenSanPham || "---";
-              document.getElementById("productCode").textContent = data.context.maSanPham || "---";
-            }
-
-            // chỉ fill máy đang chọn
-            const mi = parseInt(f.machine);
-            fillOneMachine(mi, data.machineData || {});
-          }
-
-          function start(){
-            stop();
-            document.getElementById("btnStart").disabled = true;
-            document.getElementById("btnStop").disabled = false;
-
-            const ms = Math.max(200, parseInt(document.getElementById("pollMs").value || "1000"));
-            pollOnce();
-            timer = setInterval(pollOnce, ms);
-          }
-
-          function stop(){
-            if(timer){
-              clearInterval(timer);
-              timer = null;
-            }
-            document.getElementById("btnStart").disabled = false;
-            document.getElementById("btnStop").disabled = true;
-          }
-
-          document.getElementById("btnStart").addEventListener("click", start);
-          document.getElementById("btnStop").addEventListener("click", stop);
-
-          // đổi selection => load lại context, nếu đang chạy thì poll lại
-          ["lineSelect","machineSelect","shiftSelect"].forEach(id=>{
-            document.getElementById(id).addEventListener("change", async ()=>{
-              await loadContext();
-              if(timer) pollOnce();
-            });
-          });
-
-          // init
-          setConn(false);
-          loadContext();
-        })();
+        document.getElementById("lineSelect")?.addEventListener("change", syncTopTitles);
+        document.getElementById("machineSelect")?.addEventListener("change", syncTopTitles);
+        document.getElementById("shiftSelect")?.addEventListener("change", syncTopTitles);
+        syncTopTitles();
     </script>
+    @*Cập nhật việc đồng bộ liên tục*@
+    <script>
+        function syncConn(){
+          const left = document.getElementById("connStatus");
+          const right = document.getElementById("connBadgeRight");
+          if(!left || !right) return;
+          right.textContent = left.textContent;
+        }
+        setInterval(syncConn, 500);
+    </script>
+
 }

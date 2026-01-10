@@ -19,7 +19,5 @@ namespace TEST1_SCADA.Data
 
         public DbSet<ParameterSetting> ParameterSettings { get; set; } // bảng lưu thông số người dùng nhập vào
 
-        public DbSet<MonitorData2> MonitorDatas { get; set; }
-
     }
 }

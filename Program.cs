@@ -4,15 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using TEST1_SCADA.Data;
-using TEST1_SCADA.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-// Đăng ký dịch vụ PlcService để sử dụng trong toàn bộ ứng dụng
-builder.Services.AddSingleton<TEST1_SCADA.Services.PlcService>();
 
 // Cấu hình để kết nối cơ sở dữ liệu
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
