@@ -176,7 +176,7 @@
                         </div>
                     </div>
 
-                    <!-- Tóm tắt đang chọn + nút dây chuyền để lấp trống -->
+                    <!-- Tóm tắt đang chọn + nút dây chuyền  -->
                     <div class="row g-2 mt-2">
                         <div class="col-12 col-md-8">
                             <div class="p-3 rounded border bg-white">
@@ -294,44 +294,72 @@
     </div>
 </div>
 @section Scripts {
-    @*Đồng bộ dữ liệu ở khung bên trái và bên phải*@
     <script>
-        function syncTopTitles(){
-          const line = document.getElementById("lineSelect")?.value || "1";
-          const machine = document.getElementById("machineSelect")?.value || "1";
-          const ca = document.getElementById("shiftSelect")?.value || "Ca 1";
-
-          const lineText = "Dây chuyền " + line;
-          const machineText = "Máy " + machine;
-
-          const lt = document.getElementById("lineTitleText");
-          const mt = document.getElementById("machineTitleText");
-          const st = document.getElementById("shiftTitleText");
-          if(lt) lt.textContent = lineText;
-          if(mt) mt.textContent = machineText;
-          if(st) st.textContent = ca;
-
-          const lineBadge = document.getElementById("lineTitle");
-          if(lineBadge) lineBadge.textContent = lineText;
-
-          const shiftText = document.getElementById("shiftText");
-          if(shiftText) shiftText.textContent = ca;
+        // map "Ca 1" -> 1, "Ca 2" -> 2...
+        function parseCaSo(caText) {
+          if (!caText) return 1;
+          const m = caText.match(/\d+/);
+          return m ? parseInt(m[0]) : 1;
         }
 
-        document.getElementById("lineSelect")?.addEventListener("change", syncTopTitles);
-        document.getElementById("machineSelect")?.addEventListener("change", syncTopTitles);
-        document.getElementById("shiftSelect")?.addEventListener("change", syncTopTitles);
-        syncTopTitles();
-    </script>
-    @*Cập nhật việc đồng bộ liên tục*@
-    <script>
-        function syncConn(){
-          const left = document.getElementById("connStatus");
-          const right = document.getElementById("connBadgeRight");
-          if(!left || !right) return;
-          right.textContent = left.textContent;
+        function setText(id, val) {
+          const el = document.getElementById(id);
+          if (el) el.textContent = (val ?? "");
         }
-        setInterval(syncConn, 500);
+
+        async function updateRunningInfo() {
+          const line = parseInt(document.getElementById("lineSelect").value);
+          const machine = parseInt(document.getElementById("machineSelect").value);
+          const caText = document.getElementById("shiftSelect").value; // "Ca 1"
+          const caSo = parseCaSo(caText);
+          const pollMs = parseInt(document.getElementById("pollMs").value || "1000");
+
+          // cập nhật phần text “đang chọn”
+          setText("lineTitle", `Dây chuyền ${line}`);
+          setText("lineTitleText", `Dây chuyền ${line}`);
+          setText("machineTitleText", `Máy ${machine}`);
+          setText("shiftTitleText", caText);
+          setText("shiftText", caText);
+
+          // gọi server để resolve sản phẩm + trưởng ca theo dữ liệu bạn đã lưu
+          const res = await fetch("/plc/monitor/context", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ line, machine, caSo, pollMs })
+          });
+
+          const j = await res.json();
+
+          if (!j.success) {
+            setText("leaderName", "---");
+            setText("leaderCode", "---");
+            setText("productName", "---");
+            setText("productCode", "---");
+            return;
+          }
+
+          setText("leaderName", j.leaderName || "---");
+          setText("leaderCode", j.leaderCode || "---");
+          setText("productName", j.productName || "---");
+          setText("productCode", j.productCode || "---");
+
+          // cập nhật thời gian update
+          const now = new Date();
+          setText("updatedAt", now.toLocaleTimeString());
+
+          // badge bên phải (chưa xử PLC thì để tạm)
+          setText("connBadgeRight", "Ready");
+        }
+
+        // lắng nghe thay đổi
+        document.getElementById("lineSelect").addEventListener("change", updateRunningInfo);
+        document.getElementById("machineSelect").addEventListener("change", updateRunningInfo);
+        document.getElementById("shiftSelect").addEventListener("change", updateRunningInfo);
+        document.getElementById("pollMs").addEventListener("change", updateRunningInfo);
+
+        // chạy lần đầu khi load trang
+        updateRunningInfo();
     </script>
 
 }
+

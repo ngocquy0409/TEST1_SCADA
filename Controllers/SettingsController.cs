@@ -212,6 +212,73 @@ namespace TEST1_SCADA.Controllers
 
             return Json(list);
         }
+        // API lấy cấu hình tham số theo SanPhamId để điền vào form Nhập sản lượng
+        [HttpGet]
+        public IActionResult ResolveProductionBySanPhamId([FromQuery] int sanPhamId)
+        {
+            if (sanPhamId <= 0)
+                return BadRequest(new { ok = false, message = "SanPhamId không hợp lệ" });
+
+            // Lấy cấu hình thông số mới nhất theo sản phẩm
+            var ps = _context.ParameterSettings
+                .OrderByDescending(x => x.Id)
+                .FirstOrDefault(x => x.SanPhamId == sanPhamId);
+
+            if (ps == null)
+                return Ok(new { ok = false, message = "Chưa có cấu hình trong ParameterSettings cho sản phẩm này" });
+
+            // ====== MAP dữ liệu từ ParameterSettings sang form Nhập sản lượng ======
+            // ps.Ca đang là string: "Ca 1" / "Ca 2" / "Ca 3"
+            int caSo = 1;
+            if (!string.IsNullOrWhiteSpace(ps.Ca))
+            {
+                if (ps.Ca.Contains("2")) caSo = 2;
+                else if (ps.Ca.Contains("3")) caSo = 3;
+                else caSo = 1;
+            }
+
+            // ps.TenDayChuyen thường là "Dây chuyền 1" còn dropdown của bạn là "Line 1"
+            string dayChuyen = MapDayChuyen(ps.TenDayChuyen);
+
+            // ps.TenMay: "Máy 1"..."Máy 4"
+            string tenMay = ps.TenMay ?? "";
+
+            // nếu muốn lấy số máy 1..4
+            int maySo = ExtractNumber(tenMay);
+
+            return Ok(new
+            {
+                ok = true,
+                data = new
+                {
+                    caSo,
+                    dayChuyen,   // dạng "Line 1" để set đúng dropdown #dayChuyen
+                    tenMay,
+                    maySo
+                }
+            });
+
+            // ===== local functions =====
+            static string MapDayChuyen(string? tenDayChuyen)
+            {
+                if (string.IsNullOrWhiteSpace(tenDayChuyen)) return "";
+
+                // Nếu đã là "Line 1" thì trả về luôn
+                if (tenDayChuyen.Trim().StartsWith("Line", StringComparison.OrdinalIgnoreCase))
+                    return tenDayChuyen.Trim();
+
+                // Nếu là "Dây chuyền 1" -> "Line 1"
+                var n = ExtractNumber(tenDayChuyen);
+                return n > 0 ? $"Line {n}" : tenDayChuyen.Trim();
+            }
+
+            static int ExtractNumber(string s)
+            {
+                if (string.IsNullOrWhiteSpace(s)) return 0;
+                var digits = new string(s.Where(char.IsDigit).ToArray());
+                return int.TryParse(digits, out var n) ? n : 0;
+            }
+        }
 
         // DTO để nhận JSON từ JS
         public class SaveParameterSettingDto // DTO để nhận dữ liệu từ client

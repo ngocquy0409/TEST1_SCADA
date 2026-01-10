@@ -12,8 +12,8 @@ using TEST1_SCADA.Data;
 namespace TEST1_SCADA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260109172140_AddMonitorData2")]
-    partial class AddMonitorData2
+    [Migration("20260110172023_AddMonitorRecord")]
+    partial class AddMonitorRecord
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -227,78 +227,150 @@ namespace TEST1_SCADA.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TEST1_SCADA.Models.MonitorData2", b =>
+            modelBuilder.Entity("TEST1_SCADA.Models.MonitorRecord", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("CaSo")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Ca")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Empty")
+                    b.Property<int>("Line")
                         .HasColumnType("int");
 
-                    b.Property<int>("EmptyPct")
+                    b.Property<int?>("M1_Empty")
                         .HasColumnType("int");
 
-                    b.Property<int>("Good")
+                    b.Property<int?>("M1_EmptyPct")
                         .HasColumnType("int");
 
-                    b.Property<int>("Jam")
+                    b.Property<int?>("M1_Good")
                         .HasColumnType("int");
 
-                    b.Property<string>("MaSanPham")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("M1_Jam")
+                        .HasColumnType("int");
 
-                    b.Property<string>("MaTruongCa")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("M1_Oee")
+                        .HasColumnType("int");
 
-                    b.Property<int>("Oee")
+                    b.Property<int?>("M1_Speed")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M1_Stop5m")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M1_Stop5s")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M1_Total")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M2_Empty")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M2_EmptyPct")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M2_Good")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M2_Jam")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M2_Oee")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M2_Speed")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M2_Stop5m")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M2_Stop5s")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M2_Total")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M3_Empty")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M3_EmptyPct")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M3_Good")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M3_Jam")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M3_Oee")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M3_Speed")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M3_Stop5m")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M3_Stop5s")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M3_Total")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M4_Empty")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M4_EmptyPct")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M4_Good")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M4_Jam")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M4_Oee")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M4_Speed")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M4_Stop5m")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M4_Stop5s")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("M4_Total")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Machine")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PollMs")
                         .HasColumnType("int");
 
                     b.Property<int?>("SanPhamId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Speed")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Stop5m")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Stop5s")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TenDayChuyen")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TenMay")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TenSanPham")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TenTruongCa")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Total")
+                    b.Property<int?>("TruongCaId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("MonitorDatas");
+                    b.HasIndex("SanPhamId");
+
+                    b.HasIndex("TruongCaId");
+
+                    b.ToTable("MonitorRecords");
                 });
 
             modelBuilder.Entity("TEST1_SCADA.Models.ParameterSetting", b =>
@@ -509,6 +581,21 @@ namespace TEST1_SCADA.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("TEST1_SCADA.Models.MonitorRecord", b =>
+                {
+                    b.HasOne("TEST1_SCADA.Models.SanPham", "SanPham")
+                        .WithMany()
+                        .HasForeignKey("SanPhamId");
+
+                    b.HasOne("TEST1_SCADA.Models.TruongCa", "TruongCa")
+                        .WithMany()
+                        .HasForeignKey("TruongCaId");
+
+                    b.Navigation("SanPham");
+
+                    b.Navigation("TruongCa");
                 });
 #pragma warning restore 612, 618
         }

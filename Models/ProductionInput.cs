@@ -17,8 +17,11 @@ namespace TEST1_SCADA.Models
         [Required]
         public string DayChuyen { get; set; } = "";  // Line 1/2/3...
 
+       // public int MayId { get; set; }        // FK -> May.Id
+
         [Range(0, 100000000)]
         public int SanLuongThuc { get; set; }
+
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }

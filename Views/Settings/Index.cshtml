@@ -311,6 +311,9 @@
           const opt = e.target.options[e.target.selectedIndex];
           const name = opt?.getAttribute("data-name") || "";
           document.getElementById("tenSanPham").value = name;
+          document.getElementById("caSo").disabled = true;
+          document.getElementById("dayChuyen").disabled = true;
+
         });
     </script>
     @*tự nhập khi load lại trang*@
@@ -331,6 +334,7 @@
 
           const dayChuyen = document.getElementById("dayChuyen").value;
           const sanLuong = parseInt(document.getElementById("sanLuongThuc").value || "0");
+          if (!Number.isFinite(sanLuong) || sanLuong <= 0) return alert("Nhập sản lượng thực > 0!");
 
           if(!ngay) return alert("Chọn ngày sản xuất!");
           if(sanPhamId <= 0) return alert("Chọn mã sản phẩm!");
@@ -410,6 +414,56 @@
           if(input) input.value = name;
         });
     </script>
+    @*Khi chọn mã sản phẩm, sẽ tự điền tên sản phẩm + ca + line + tên máy*@
+    <script>
+        async function resolveFromProduct() {
+          const select = document.getElementById("sanPhamSelect");
+          const sanPhamId = parseInt(select.value || "0", 10);
+
+          // 1) Fill tên sản phẩm luôn từ data-name (nhanh, không cần gọi API)
+          const opt = select.options[select.selectedIndex];
+          const ten = opt?.getAttribute("data-name") || "";
+          document.getElementById("tenSanPham").value = ten;
+
+          // nếu chưa chọn sản phẩm -> clear các ô auto
+          if (!sanPhamId) {
+            document.getElementById("tenMay").value = "";
+            document.getElementById("maySo").value = "";
+            // không clear ca/dayChuyen nếu bạn muốn giữ tay người dùng
+            return;
+          }
+
+          // 2) gọi API lấy Ca/Line/Máy theo ParameterSettings
+          const r = await fetch(`/Settings/ResolveProductionBySanPhamId?sanPhamId=${encodeURIComponent(sanPhamId)}`);
+          const j = await r.json();
+
+          if (!j.ok) {
+            console.warn(j.message || "Không resolve được từ ParameterSettings");
+            @*disable ca và dây chuyền để user không sửa tay*@
+            document.getElementById("caSo").disabled = true;
+            document.getElementById("dayChuyen").disabled = true;
+            return;
+          }
+
+          const d = j.data;
+
+          // set Ca (dropdown đang value 1/2/3)
+          if (d.caSo) document.getElementById("caSo").value = d.caSo;
+
+          // set DayChuyen (dropdown đang value "Line 1", "Line 2"...)
+          if (d.dayChuyen) document.getElementById("dayChuyen").value = d.dayChuyen;
+
+          // set Tên máy
+          document.getElementById("tenMay").value = d.tenMay || "";
+          document.getElementById("maySo").value = d.maySo || "";
+        }
+        @*gắn sự kiện onchange*@
+        document.getElementById("sanPhamSelect").addEventListener("change", resolveFromProduct);
+
+        // auto fill ngay khi load nếu dropdown đang có value
+        resolveFromProduct();
+    </script>
+
     @*Thiết lập, post jsson lên /Settings/SaveParameterSetting*@
     <script>
         function toIntOrNull(v){
