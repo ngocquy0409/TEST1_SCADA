@@ -294,6 +294,7 @@
     </div>
 </div>
 @section Scripts {
+    @*dùng để tự điền tên trưởng ca và tên sản phẩm dựa vào ca và máy + dây chuyền đã được chọn*@
     <script>
         document.addEventListener("DOMContentLoaded", () => {
 
@@ -398,27 +399,34 @@
             return { ok: !!j.success, msg: j.status || "" };
           }
 
-          async function readDb3ToMachine1Once() {
+          // ✅ fill 1 máy theo index i=1..4
+          function fillMachine(i, j) {
+            setVal(`m${i}_speed`,    j[`M${i}_Speed`]);
+            setVal(`m${i}_oee`,      j[`M${i}_Oee`]);
+            setVal(`m${i}_stop5s`,   j[`M${i}_Stop5s`]);
+            setVal(`m${i}_stop5m`,   j[`M${i}_Stop5m`]);
+            setVal(`m${i}_emptyPct`, j[`M${i}_EmptyPct`]);
+            setVal(`m${i}_total`,    j[`M${i}_Total`]);
+            setVal(`m${i}_good`,     j[`M${i}_Good`]);
+            setVal(`m${i}_jam`,      j[`M${i}_Jam`]);
+            setVal(`m${i}_empty`,    j[`M${i}_Empty`]);
+          }
+
+          // đọc 1 lần và fill cả 4 máy (DB3..DB6 nằm trong controller)
+          async function readAllMachinesOnce() {
             const line = Number($("lineSelect")?.value || "1");
+            const machineFocus = Number($("machineSelect")?.value || "1"); // để resolve SP/Trưởng ca
             const caSo = Number(($("shiftSelect")?.value || "Ca 1").replace("Ca", "").trim() || "1");
 
-            const url = `/plc/read-save?line=${encodeURIComponent(line)}&machine=1&caSo=${encodeURIComponent(caSo)}`;
+            const url = `/plc/read-save?line=${encodeURIComponent(line)}&machine=${encodeURIComponent(machineFocus)}&caSo=${encodeURIComponent(caSo)}`;
             const r = await fetch(url, { cache: "no-store" });
             const j = await r.json();
 
             console.log("read-save:", j);
-
             if (!j.ok) return;
 
-            setVal("m1_speed", j.M1_Speed);
-            setVal("m1_oee", j.M1_Oee);
-            setVal("m1_stop5s", j.M1_Stop5s);
-            setVal("m1_stop5m", j.M1_Stop5m);
-            setVal("m1_emptyPct", j.M1_EmptyPct);
-            setVal("m1_total", j.M1_Total);
-            setVal("m1_good", j.M1_Good);
-            setVal("m1_jam", j.M1_Jam);
-            setVal("m1_empty", j.M1_Empty);
+            // fill máy 1..4
+            for (let i = 1; i <= 4; i++) fillMachine(i, j);
 
             if ($("updatedAt")) $("updatedAt").textContent = j.updatedAt || "--:--:--";
           }
@@ -439,8 +447,9 @@
 
             if (timer) clearInterval(timer);
 
-            await readDb3ToMachine1Once();
-            timer = setInterval(readDb3ToMachine1Once, ms);
+            // đổi từ readDb3ToMachine1Once -> readAllMachinesOnce
+            await readAllMachinesOnce();
+            timer = setInterval(readAllMachinesOnce, ms);
 
             $("btnStart") && ($("btnStart").disabled = true);
             $("btnStop") && ($("btnStop").disabled = false);
@@ -460,6 +469,7 @@
           $("btnStop")?.addEventListener("click", stop);
         })();
     </script>
+
 }
 
 

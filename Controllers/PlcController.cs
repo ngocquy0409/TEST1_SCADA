@@ -57,7 +57,7 @@ namespace TEST1_SCADA.Controllers
 
                 EnsureConnected();
 
-                // ✅ gợi ý: dùng Int16/UInt16 cho DBW
+                // ghi dữ liệu xuống PLC cho các máy
                 _plc.Write("DB2.DBW0", (short)dto.TocDoChuan);
                 _plc.Write("DB2.DBW2", (short)dto.ThoiGianDungMay);
                 _plc.Write("DB2.DBW4", (short)dto.ChapNhanGoi_x01s);
@@ -89,7 +89,7 @@ namespace TEST1_SCADA.Controllers
                 var tenMay = $"Máy {req.Machine}";
                 var caText = $"Ca {req.CaSo}";
 
-                // 1) lấy SanPhamId từ ParameterSettings
+                // lấy SanPhamId từ ParameterSettings
                 var ps = await _db.ParameterSettings        // truy vấn ParameterSettings
                     .OrderByDescending(x => x.Id)
                     .FirstOrDefaultAsync(x =>
@@ -98,7 +98,7 @@ namespace TEST1_SCADA.Controllers
                         x.Ca == caText
                     );
 
-                // 2) lấy TruongCaId từ ShiftConfigs
+                // lấy TruongCaId từ ShiftConfigs
                 var sc = await _db.ShiftConfigs             // truy vấn ShiftConfigs
                     .OrderByDescending(x => x.Id)
                     .FirstOrDefaultAsync(x => x.CaSo == req.CaSo);
@@ -117,7 +117,7 @@ namespace TEST1_SCADA.Controllers
                 _db.MonitorRecords.Add(record);
                 await _db.SaveChangesAsync();
 
-                // 3) trả về context đã resolve tên (để fill UI)
+                // trả về context đã resolve tên (để fill UI)
                 var sanPham = record.SanPhamId != null          // lấy mã/tên sp theo SanPhamId
                     ? await _db.SanPham.FirstOrDefaultAsync(x => x.Id == record.SanPhamId)
                     : null;
@@ -125,7 +125,7 @@ namespace TEST1_SCADA.Controllers
                 var truongCa = record.TruongCaId != null        // lấy tên trưởng ca theo TruongCaId
                     ? await _db.TruongCa.FirstOrDefaultAsync(x => x.Id == record.TruongCaId)
                     : null;
-                // 4) trả về kết quả
+                // trả về kết quả
                 return Json(new
                 {
                     success = true,
@@ -143,8 +143,6 @@ namespace TEST1_SCADA.Controllers
         }
         private int ReadDbInt(int db, int dbwOffset)
         {
-            // TIA "Int" = Int16 => DBW
-            // S7.Net Read("DBx.DBWn") trả object
             var obj = _plc.Read($"DB{db}.DBW{dbwOffset}");
             // có thể trả short hoặc ushort tùy
             if (obj is short s) return s;
@@ -176,7 +174,7 @@ namespace TEST1_SCADA.Controllers
             {
                 EnsureConnected();
 
-                // ====== đọc PLC DB3..DB6 ======
+                //  tạo các biến đọc dữ liệu từ PLC cho 4 máy tương ứng DB3 DB4 DB5 DB6 ứng với máy 1 2 3 4
                 var m1 = ReadOneMachineDb(3);
                 var m2 = ReadOneMachineDb(4);
                 var m3 = ReadOneMachineDb(5);
@@ -204,7 +202,7 @@ namespace TEST1_SCADA.Controllers
                     ? await _db.TruongCa.FirstOrDefaultAsync(x => x.Id == sc.TruongCaId)
                     : null;
 
-                // ====== trả DTO cho UI ======
+                // trả DTO cho UI 
                 var dto = new MonitorLiveDto
                 {
                     ok = true,
