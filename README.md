@@ -26,7 +26,7 @@
 - Code này sử dụng thư viện "Bootstrap" để tạo phần view, nôm na là nó sẽ giống như css cho html, kiểu vậy
 - Cài Bootstrap bằng lệnh: Install-Package Bootstrap
 - Cài NuGet để xuất Excel + Word:
-+ dotnet add package ClosedXML			=> dùng để tạo excel
-+ dotnet add package Xceed.Words.NET		=> dùng để tạo word, nhưng phải có license => ko dùng
-+ dotnet add package DocumentFormat.OpenXml	=> dùng thay thế bằng cái này để tạo word
-
+1. dotnet add package ClosedXML			=> dùng để tạo excel
+2. dotnet add package Xceed.Words.NET		=> dùng để tạo word, nhưng phải có license => ko dùng
+3. dotnet add package DocumentFormat.OpenXml	=> dùng thay thế bằng cái này để tạo word
+# Chưa có gì mới
