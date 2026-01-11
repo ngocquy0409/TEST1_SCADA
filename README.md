@@ -14,7 +14,7 @@
 - Nên đọc trước cái file docs có tên "Cài Đặt + Setup + Các kiểu hay dùng trong MVC ( nên đọc trước)" nhé
 - Chúc các con vợ đọc code đéo hiểu mẹ gì!!!
 # LƯU Ý CỰC KỲ KINH KHỦNG:
-- Khi đọc code, để dễ hiểu, khuyến cáo chúng mày dow cái file zip của git này về rồi giải nén ra, mở bằng VS tím, mỗi đoạn code chỉ cần thêm comment đằng sau cho nó theo kiểu "\\ " thì nó sẽ tự comment cho đoạn code đó viết cái gì, nội dung ra sao
+- Khi đọc code, để dễ hiểu, khuyến cáo chúng mày dow cái file zip của git này về rồi giải nén ra, mở bằng VS tím, mỗi đoạn code chỉ cần thêm comment đằng sau cho nó theo kiểu "\\\ " thì nó sẽ tự comment cho đoạn code đó viết cái gì, nội dung ra sao
 - Để chạy được code này thì các con vợ phải cài thêm package của code, khá nhiều, cài ẻ vcl luôn
 - Mà muốn chạy thì phải đổi tên cơ sở dữ liệu theo máy của cmay ở phần "appsettings.json" chỗ đoạn có link cơ sở dữ liệu đấy, ko đổi thì bố nào chạy được
 - Nói chung là để chạy đc code này của t trên máy chúng mày thì cũng cần phải tìm cách add các bảng cơ sở dữ liệu lên máy
