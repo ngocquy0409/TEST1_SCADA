@@ -228,63 +228,63 @@
                         <div class="row g-2 align-items-center mb-2">
                             <div class="col-7 fw-bold small">Tốc độ máy [gói/phút]</div>
                             <div class="col-5">
-                                <input id="m@i_speed" class="form-control form-control-sm" readonly />
+                                <input id="m@(i)_speed" class="form-control form-control-sm" readonly />
                             </div>
                         </div>
 
                         <div class="row g-2 align-items-center mb-2">
                             <div class="col-7 fw-bold small">Hiệu suất OEE [%]</div>
                             <div class="col-5">
-                                <input id="m@i_oee" class="form-control form-control-sm" readonly />
+                                <input id="m@(i)_oee" class="form-control form-control-sm" readonly />
                             </div>
                         </div>
 
                         <div class="row g-2 align-items-center mb-2">
                             <div class="col-7 fw-bold small">Số lần dừng quá 5 giây</div>
                             <div class="col-5">
-                                <input id="m@i_stop5s" class="form-control form-control-sm" readonly />
+                                <input id="m@(i)_stop5s" class="form-control form-control-sm" readonly />
                             </div>
                         </div>
 
                         <div class="row g-2 align-items-center mb-2">
                             <div class="col-7 fw-bold small">Số lần dừng quá 5 phút</div>
                             <div class="col-5">
-                                <input id="m@i_stop5m" class="form-control form-control-sm" readonly />
+                                <input id="m@(i)_stop5m" class="form-control form-control-sm" readonly />
                             </div>
                         </div>
 
                         <div class="row g-2 align-items-center mb-2">
                             <div class="col-7 fw-bold small">Phần trăm gói rỗng [%]</div>
                             <div class="col-5">
-                                <input id="m@i_emptyPct" class="form-control form-control-sm" readonly />
+                                <input id="m@(i)_emptyPct" class="form-control form-control-sm" readonly />
                             </div>
                         </div>
 
                         <div class="row g-2 align-items-center mb-2">
                             <div class="col-7 fw-bold small">Tổng số gói [gói]</div>
                             <div class="col-5">
-                                <input id="m@i_total" class="form-control form-control-sm" readonly />
+                                <input id="m@(i)_total" class="form-control form-control-sm" readonly />
                             </div>
                         </div>
 
                         <div class="row g-2 align-items-center mb-2">
                             <div class="col-7 fw-bold small">Số gói tốt [gói]</div>
                             <div class="col-5">
-                                <input id="m@i_good" class="form-control form-control-sm" readonly />
+                                <input id="m@(i)_good" class="form-control form-control-sm" readonly />
                             </div>
                         </div>
 
                         <div class="row g-2 align-items-center mb-2">
                             <div class="col-7 fw-bold small">Số gói bị cấn gia vị [gói]</div>
                             <div class="col-5">
-                                <input id="m@i_jam" class="form-control form-control-sm" readonly />
+                                <input id="m@(i)_jam" class="form-control form-control-sm" readonly />
                             </div>
                         </div>
 
                         <div class="row g-2 align-items-center">
                             <div class="col-7 fw-bold small">Số gói rỗng [gói]</div>
                             <div class="col-5">
-                                <input id="m@i_empty" class="form-control form-control-sm" readonly />
+                                <input id="m@(i)_empty" class="form-control form-control-sm" readonly />
                             </div>
                         </div>
                     </div>
@@ -295,71 +295,172 @@
 </div>
 @section Scripts {
     <script>
-        // map "Ca 1" -> 1, "Ca 2" -> 2...
-        function parseCaSo(caText) {
-          if (!caText) return 1;
-          const m = caText.match(/\d+/);
-          return m ? parseInt(m[0]) : 1;
-        }
+        document.addEventListener("DOMContentLoaded", () => {
 
-        function setText(id, val) {
-          const el = document.getElementById(id);
-          if (el) el.textContent = (val ?? "");
-        }
-
-        async function updateRunningInfo() {
-          const line = parseInt(document.getElementById("lineSelect").value);
-          const machine = parseInt(document.getElementById("machineSelect").value);
-          const caText = document.getElementById("shiftSelect").value; // "Ca 1"
-          const caSo = parseCaSo(caText);
-          const pollMs = parseInt(document.getElementById("pollMs").value || "1000");
-
-          // cập nhật phần text “đang chọn”
-          setText("lineTitle", `Dây chuyền ${line}`);
-          setText("lineTitleText", `Dây chuyền ${line}`);
-          setText("machineTitleText", `Máy ${machine}`);
-          setText("shiftTitleText", caText);
-          setText("shiftText", caText);
-
-          // gọi server để resolve sản phẩm + trưởng ca theo dữ liệu bạn đã lưu
-          const res = await fetch("/plc/monitor/context", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ line, machine, caSo, pollMs })
-          });
-
-          const j = await res.json();
-
-          if (!j.success) {
-            setText("leaderName", "---");
-            setText("leaderCode", "---");
-            setText("productName", "---");
-            setText("productCode", "---");
-            return;
+          function parseCaSo(caText) {
+            if (!caText) return 1;
+            const m = caText.match(/\d+/);
+            return m ? parseInt(m[0]) : 1;
           }
 
-          setText("leaderName", j.leaderName || "---");
-          setText("leaderCode", j.leaderCode || "---");
-          setText("productName", j.productName || "---");
-          setText("productCode", j.productCode || "---");
+          function setText(id, val) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = (val ?? "");
+          }
 
-          // cập nhật thời gian update
-          const now = new Date();
-          setText("updatedAt", now.toLocaleTimeString());
+          async function updateRunningInfo() {
+            const lineEl = document.getElementById("lineSelect");
+            const machineEl = document.getElementById("machineSelect");
+            const shiftEl = document.getElementById("shiftSelect");
+            const pollEl = document.getElementById("pollMs");
 
-          // badge bên phải (chưa xử PLC thì để tạm)
-          setText("connBadgeRight", "Ready");
-        }
+            if (!lineEl || !machineEl || !shiftEl || !pollEl) return;
 
-        // lắng nghe thay đổi
-        document.getElementById("lineSelect").addEventListener("change", updateRunningInfo);
-        document.getElementById("machineSelect").addEventListener("change", updateRunningInfo);
-        document.getElementById("shiftSelect").addEventListener("change", updateRunningInfo);
-        document.getElementById("pollMs").addEventListener("change", updateRunningInfo);
+            const line = parseInt(lineEl.value || "1");
+            const machine = parseInt(machineEl.value || "1");
+            const caText = shiftEl.value || "Ca 1";
+            const caSo = parseCaSo(caText);
+            const pollMs = parseInt(pollEl.value || "1000");
 
-        // chạy lần đầu khi load trang
-        updateRunningInfo();
+            setText("lineTitle", `Dây chuyền ${line}`);
+            setText("lineTitleText", `Dây chuyền ${line}`);
+            setText("machineTitleText", `Máy ${machine}`);
+            setText("shiftTitleText", caText);
+            setText("shiftText", caText);
+
+            try {
+              const res = await fetch("/plc/monitor/context", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ line, machine, caSo, pollMs })
+              });
+
+              const j = await res.json();
+
+              if (!j.success) {
+                setText("leaderName", "---");
+                setText("leaderCode", "---");
+                setText("productName", "---");
+                setText("productCode", "---");
+                return;
+              }
+
+              setText("leaderName", j.leaderName || "---");
+              setText("leaderCode", j.leaderCode || "---");
+              setText("productName", j.productName || "---");
+              setText("productCode", j.productCode || "---");
+
+              setText("updatedAt", new Date().toLocaleTimeString());
+              setText("connBadgeRight", "Ready");
+
+            } catch (e) {
+              console.error("updateRunningInfo error:", e);
+            }
+          }
+
+          document.getElementById("lineSelect")?.addEventListener("change", updateRunningInfo);
+          document.getElementById("machineSelect")?.addEventListener("change", updateRunningInfo);
+          document.getElementById("shiftSelect")?.addEventListener("change", updateRunningInfo);
+          document.getElementById("pollMs")?.addEventListener("change", updateRunningInfo);
+
+          updateRunningInfo();
+        });
     </script>
 
+    <script>
+        (() => {
+          let timer = null;
+          const $ = (id) => document.getElementById(id);
+
+          function setConn(isOk, text) {
+            const left = $("connStatus");
+            const right = $("connBadgeRight");
+            if (left) {
+              left.textContent = text;
+              left.className = "badge " + (isOk ? "bg-success" : "bg-danger");
+            }
+            if (right) {
+              right.textContent = text;
+              right.className = "badge " + (isOk ? "bg-success" : "bg-secondary");
+            }
+          }
+
+          function setVal(id, v) {
+            const el = $(id);
+            if (!el) return;
+            el.value = (v ?? "");
+          }
+
+          async function connectPlc() {
+            const r = await fetch("/plc/connect", { method: "POST" });
+            const j = await r.json();
+            if (!r.ok) return { ok: false, msg: "HTTP " + r.status };
+            return { ok: !!j.success, msg: j.status || "" };
+          }
+
+          async function readDb3ToMachine1Once() {
+            const line = Number($("lineSelect")?.value || "1");
+            const caSo = Number(($("shiftSelect")?.value || "Ca 1").replace("Ca", "").trim() || "1");
+
+            const url = `/plc/read-save?line=${encodeURIComponent(line)}&machine=1&caSo=${encodeURIComponent(caSo)}`;
+            const r = await fetch(url, { cache: "no-store" });
+            const j = await r.json();
+
+            console.log("read-save:", j);
+
+            if (!j.ok) return;
+
+            setVal("m1_speed", j.M1_Speed);
+            setVal("m1_oee", j.M1_Oee);
+            setVal("m1_stop5s", j.M1_Stop5s);
+            setVal("m1_stop5m", j.M1_Stop5m);
+            setVal("m1_emptyPct", j.M1_EmptyPct);
+            setVal("m1_total", j.M1_Total);
+            setVal("m1_good", j.M1_Good);
+            setVal("m1_jam", j.M1_Jam);
+            setVal("m1_empty", j.M1_Empty);
+
+            if ($("updatedAt")) $("updatedAt").textContent = j.updatedAt || "--:--:--";
+          }
+
+          async function start() {
+            const ms = Math.max(200, Number($("pollMs")?.value || 1000));
+
+            setConn(false, "Connecting...");
+
+            const c = await connectPlc();
+            if (!c.ok) {
+              setConn(false, "Disconnected");
+              alert("Kết nối PLC thất bại: " + c.msg);
+              return;
+            }
+
+            setConn(true, "Connected");
+
+            if (timer) clearInterval(timer);
+
+            await readDb3ToMachine1Once();
+            timer = setInterval(readDb3ToMachine1Once, ms);
+
+            $("btnStart") && ($("btnStart").disabled = true);
+            $("btnStop") && ($("btnStop").disabled = false);
+          }
+
+          function stop() {
+            if (timer) clearInterval(timer);
+            timer = null;
+
+            $("btnStart") && ($("btnStart").disabled = false);
+            $("btnStop") && ($("btnStop").disabled = true);
+
+            setConn(false, "Stopped");
+          }
+
+          $("btnStart")?.addEventListener("click", start);
+          $("btnStop")?.addEventListener("click", stop);
+        })();
+    </script>
 }
+
+
 

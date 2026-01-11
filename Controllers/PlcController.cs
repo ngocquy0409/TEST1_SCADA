@@ -31,7 +31,7 @@ namespace TEST1_SCADA.Controllers
                 _plc.Open();
         }
 
-        // ✅ POST /plc/connect
+        // POST /plc/connect
         [HttpPost("connect")] // kết nối đến PLC
         public IActionResult Connect()
         {
@@ -47,7 +47,7 @@ namespace TEST1_SCADA.Controllers
             }
         }
 
-        // ✅ POST /plc/WriteParameters
+        // POST /plc/WriteParameters
         [HttpPost("WriteParameters")]   // ghi thông số xuống PLC
         public IActionResult WriteParameters([FromBody] PlcParameterWrite dto)
         {
@@ -139,6 +139,184 @@ namespace TEST1_SCADA.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { success = false, message = ex.Message }); // lỗi server 
+            }
+        }
+        private int ReadDbInt(int db, int dbwOffset)
+        {
+            // TIA "Int" = Int16 => DBW
+            // S7.Net Read("DBx.DBWn") trả object
+            var obj = _plc.Read($"DB{db}.DBW{dbwOffset}");
+            // có thể trả short hoặc ushort tùy
+            if (obj is short s) return s;
+            if (obj is ushort us) return us;
+            return Convert.ToInt32(obj);
+        }
+
+        // hàm đọc dữ liệu của 1 máy từ DB PLC
+        private (int Speed, int Oee, int Stop5s, int Stop5m, int EmptyPct, int Total, int Good, int Jam, int Empty) ReadOneMachineDb(int db)
+        {
+            // A1..A9: DBW0..16 (mỗi int 2 byte)
+            var speed = ReadDbInt(db, 0);
+            var oee = ReadDbInt(db, 2);
+            var stop5s = ReadDbInt(db, 4);
+            var stop5m = ReadDbInt(db, 6);
+            var emptyPct = ReadDbInt(db, 8);
+            var total = ReadDbInt(db, 10);
+            var good = ReadDbInt(db, 12);
+            var jam = ReadDbInt(db, 14);
+            var empty = ReadDbInt(db, 16);
+
+            return (speed, oee, stop5s, stop5m, emptyPct, total, good, jam, empty);
+        }
+        // hàm đọc và lưu dữ liệu giám sát từ PLC
+        [HttpGet("read-save")]
+        public async Task<IActionResult> ReadSave([FromQuery] int line = 1, [FromQuery] int machine = 1, [FromQuery] int caSo = 1)
+        {
+            try
+            {
+                EnsureConnected();
+
+                // ====== đọc PLC DB3..DB6 ======
+                var m1 = ReadOneMachineDb(3);
+                var m2 = ReadOneMachineDb(4);
+                var m3 = ReadOneMachineDb(5);
+                var m4 = ReadOneMachineDb(6);
+
+                // Sản phẩm: ParameterSettings theo Dây chuyền/Máy/Ca
+                var tenDayChuyen = $"Dây chuyền {line}";
+                var tenMay = $"Máy {machine}";
+                var caText = $"Ca {caSo}";
+
+                var ps = await _db.ParameterSettings
+                    .OrderByDescending(x => x.Id)
+                    .FirstOrDefaultAsync(x => x.TenDayChuyen == tenDayChuyen && x.TenMay == tenMay && x.Ca == caText);
+
+                var sp = ps?.SanPhamId != null
+                    ? await _db.SanPham.FirstOrDefaultAsync(x => x.Id == ps.SanPhamId)
+                    : null;
+
+                // Trưởng ca: ShiftConfigs theo CaSo -> TruongCaId
+                var sc = await _db.ShiftConfigs
+                    .OrderByDescending(x => x.Id)
+                    .FirstOrDefaultAsync(x => x.CaSo == caSo);
+
+                var tc = sc != null
+                    ? await _db.TruongCa.FirstOrDefaultAsync(x => x.Id == sc.TruongCaId)
+                    : null;
+
+                // ====== trả DTO cho UI ======
+                var dto = new MonitorLiveDto
+                {
+                    ok = true,
+                    updatedAt = DateTime.Now.ToString("HH:mm:ss"),
+
+                    maTruongCa = tc?.MaTruongCa ?? "",
+                    tenTruongCa = tc?.HovaTen ?? "",
+
+                    maSanPham = sp?.MaSanPham ?? ps?.MaSanPham ?? "",
+                    tenSanPham = sp?.TenSanPham ?? ps?.TenSanPham ?? "",
+
+                    M1_Speed = m1.Speed,
+                    M1_Oee = m1.Oee,
+                    M1_Stop5s = m1.Stop5s,
+                    M1_Stop5m = m1.Stop5m,
+                    M1_EmptyPct = m1.EmptyPct,
+                    M1_Total = m1.Total,
+                    M1_Good = m1.Good,
+                    M1_Jam = m1.Jam,
+                    M1_Empty = m1.Empty,
+
+                    M2_Speed = m2.Speed,
+                    M2_Oee = m2.Oee,
+                    M2_Stop5s = m2.Stop5s,
+                    M2_Stop5m = m2.Stop5m,
+                    M2_EmptyPct = m2.EmptyPct,
+                    M2_Total = m2.Total,
+                    M2_Good = m2.Good,
+                    M2_Jam = m2.Jam,
+                    M2_Empty = m2.Empty,
+
+                    M3_Speed = m3.Speed,
+                    M3_Oee = m3.Oee,
+                    M3_Stop5s = m3.Stop5s,
+                    M3_Stop5m = m3.Stop5m,
+                    M3_EmptyPct = m3.EmptyPct,
+                    M3_Total = m3.Total,
+                    M3_Good = m3.Good,
+                    M3_Jam = m3.Jam,
+                    M3_Empty = m3.Empty,
+
+                    M4_Speed = m4.Speed,
+                    M4_Oee = m4.Oee,
+                    M4_Stop5s = m4.Stop5s,
+                    M4_Stop5m = m4.Stop5m,
+                    M4_EmptyPct = m4.EmptyPct,
+                    M4_Total = m4.Total,
+                    M4_Good = m4.Good,
+                    M4_Jam = m4.Jam,
+                    M4_Empty = m4.Empty,
+                };
+                // tạo biến 
+                var rec = new MonitorRecord
+                {
+                    Line = line,
+                    Machine = machine,
+                    CaSo = caSo,
+                    PollMs = 1000,
+                    CreatedAt = DateTime.Now,
+                    TruongCaId = sc?.TruongCaId,
+                    SanPhamId = ps?.SanPhamId,
+
+                    M1_Speed = dto.M1_Speed,
+                    M1_Oee = dto.M1_Oee,
+                    M1_Stop5s = dto.M1_Stop5s,
+                    M1_Stop5m = dto.M1_Stop5m,
+                    M1_EmptyPct = dto.M1_EmptyPct,
+                    M1_Total = dto.M1_Total,
+                    M1_Good = dto.M1_Good,
+                    M1_Jam = dto.M1_Jam,
+                    M1_Empty = dto.M1_Empty,
+
+                    M2_Speed = dto.M2_Speed,
+                    M2_Oee = dto.M2_Oee,
+                    M2_Stop5s = dto.M2_Stop5s,
+                    M2_Stop5m = dto.M2_Stop5m,
+                    M2_EmptyPct = dto.M2_EmptyPct,
+                    M2_Total = dto.M2_Total,
+                    M2_Good = dto.M2_Good,
+                    M2_Jam = dto.M2_Jam,
+                    M2_Empty = dto.M2_Empty,
+
+                    M3_Speed = dto.M3_Speed,
+                    M3_Oee = dto.M3_Oee,
+                    M3_Stop5s = dto.M3_Stop5s,
+                    M3_Stop5m = dto.M3_Stop5m,
+                    M3_EmptyPct = dto.M3_EmptyPct,
+                    M3_Total = dto.M3_Total,
+                    M3_Good = dto.M3_Good,
+                    M3_Jam = dto.M3_Jam,
+                    M3_Empty = dto.M3_Empty,
+
+                    M4_Speed = dto.M4_Speed,
+                    M4_Oee = dto.M4_Oee,
+                    M4_Stop5s = dto.M4_Stop5s,
+                    M4_Stop5m = dto.M4_Stop5m,
+                    M4_EmptyPct = dto.M4_EmptyPct,
+                    M4_Total = dto.M4_Total,
+                    M4_Good = dto.M4_Good,
+                    M4_Jam = dto.M4_Jam,
+                    M4_Empty = dto.M4_Empty,
+                };
+
+                _db.MonitorRecords.Add(rec);
+                await _db.SaveChangesAsync();
+
+                return Json(dto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "read-save failed");
+                return Json(new { ok = false, message = ex.Message });
             }
         }
     }

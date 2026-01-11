@@ -21,7 +21,5 @@ namespace TEST1_SCADA.Data
         public DbSet<ParameterSetting> ParameterSettings { get; set; } // bảng lưu thông số người dùng nhập vào
 
         public DbSet<MonitorRecord> MonitorRecords { get; set; } = default!; // bảng lưu dữ liệu giám sát từ PLC
-
-
     }
 }
