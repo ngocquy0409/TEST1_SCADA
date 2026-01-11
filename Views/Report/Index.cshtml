@@ -175,8 +175,8 @@
         </div>
 
         <div class="card-footer bg-white d-flex flex-wrap gap-2 justify-content-end">
-            <button type="button" class="btn btn-success">Xuất Excel</button>
-            <button type="button" class="btn btn-primary">In báo cáo</button>
+            <button type="button" id="btnExportExcel" class="btn btn-success">Xuất Excel</button>
+            <button type="button" id="btnExportWord" class="btn btn-primary">In báo cáo</button>
         </div>
     </div>
 </div>
@@ -263,5 +263,31 @@
         document.addEventListener("DOMContentLoaded", () => {
           document.getElementById("btnReportView")?.addEventListener("click", loadReportFromPlc);
         });
+    </script>
+    @*JS cho xuất excel và in báo cáo word*@
+    <script>
+          function parseNum(selectId, fallback = 1) {
+          const t = document.getElementById(selectId)?.value || "";
+          const m = t.match(/\d+/);
+          return m ? Number(m[0]) : fallback;
+        }
+
+        function getQuery() {
+          const line = parseNum("rpLine", 1);
+          const machine = parseNum("rpMachine", 1);
+          const caSo = parseNum("rpShift", 1);
+          return { line, machine, caSo };
+        }
+
+        document.getElementById("btnExportExcel")?.addEventListener("click", () => {
+          const q = getQuery();
+          window.location.href = `/Report/ExportExcel?line=${q.line}&machine=${q.machine}&caSo=${q.caSo}`;
+        });
+
+        document.getElementById("btnExportWord")?.addEventListener("click", () => {
+          const q = getQuery();
+          window.location.href = `/Report/ExportWord?line=${q.line}&machine=${q.machine}&caSo=${q.caSo}`;
+        });
+
     </script>
 }
