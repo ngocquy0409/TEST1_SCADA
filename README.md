@@ -15,3 +15,5 @@
 - Chúc các con vợ đọc code đéo hiểu mẹ gì!!!
 # LƯU Ý CỰC KỲ KINH KHỦNG:
 - Khi đọc code, để dễ hiểu, khuyến cáo chúng mày dow cái file zip của git này về rồi giải nén ra, mở bằng VS tím, mỗi đoạn code chỉ cần thêm comment đằng sau cho nó theo kiểu "\\ " thì nó sẽ tự comment cho đoạn code đó viết cái gì, nội dung ra sao
+- Để chạy được code này thì các con vợ phải cài thêm package của code, khá nhiều, cài ẻ vcl luôn
+- Mà muốn chạy thì phải đổi tên cơ sở dữ liệu theo máy của cmay ở phần "Program.cs"
