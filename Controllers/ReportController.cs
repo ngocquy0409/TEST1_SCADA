@@ -1,12 +1,12 @@
 ﻿using ClosedXML.Excel;      // thư viện tạo file Excel
+using DocumentFormat.OpenXml;               // thư viện tạo file Word
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;    // thư viện tạo file Word
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using S7.Net;
 using TEST1_SCADA.Data;
 using TEST1_SCADA.Models;
-using DocumentFormat.OpenXml;               // thư viện tạo file Word
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Wordprocessing;    // thư viện tạo file Word
 
 namespace TEST1_SCADA.Controllers
 {
@@ -138,8 +138,8 @@ namespace TEST1_SCADA.Controllers
         [HttpGet]
         public async Task<IActionResult> ExportExcel(int line = 1, int machine = 1, int caSo = 1)
         {
-            var rec = await GetLatestReportAsync(line, machine, caSo);
-            if (rec == null) return BadRequest("Chưa có dữ liệu báo cáo để xuất!");
+            var rec = await GetLatestReportAsync(line, machine, caSo);  // lấy bản ghi mới nhất theo bộ lọc 
+            if (rec == null) return BadRequest("Chưa có dữ liệu báo cáo để xuất!"); // nếu không có dữ liệu thì báo lỗi
 
             using var wb = new XLWorkbook();
             var ws = wb.Worksheets.Add("BaoCao");
@@ -202,7 +202,7 @@ namespace TEST1_SCADA.Controllers
             using var ms = new MemoryStream();
             wb.SaveAs(ms);
             var bytes = ms.ToArray();
-
+            // trả về file Excel đã tạo
             var fileName = $"BaoCao_Line{line}_May{machine}_Ca{caSo}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
             return File(bytes,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -210,86 +210,105 @@ namespace TEST1_SCADA.Controllers
         }
         // Xuất Word 
         [HttpGet]
-        public IActionResult ExportWord(int line = 1, int machine = 1, int caSo = 1)
+        public async Task<IActionResult> ExportWord(int line = 1, int machine = 1, int caSo = 1)
         {
-            // TODO: lấy data báo cáo từ DB (ReportRecord) hoặc PLC
-            // ví dụ: var d = ... (mttr, mtbf, stopPct,...)
-
+            // lấy bản ghi mới nhất theo bộ lọc
+            var rec = await GetLatestReportAsync(line, machine, caSo);
+            if (rec == null) return BadRequest("Chưa có dữ liệu báo cáo để in!");
+            // hàm chuyển đổi giá trị thành chuỗi
+            string V(object? x) => x?.ToString() ?? "--";
+            // tạo file Word trong bộ nhớ
             using var ms = new MemoryStream();
             using (var doc = WordprocessingDocument.Create(ms, WordprocessingDocumentType.Document, true))
             {
+                // tạo phần chính của tài liệu
                 var main = doc.AddMainDocumentPart();
                 main.Document = new Document(new Body());
                 var body = main.Document.Body!;
 
-                // Title
-                body.AppendChild(new Paragraph(
-                    new ParagraphProperties(new Justification() { Val = JustificationValues.Center }),
-                    new Run(new RunProperties(new Bold(), new FontSize { Val = "32" }), new Text("BẢNG THÔNG SỐ ĐÁNH GIÁ"))
-                ));
-
-                body.AppendChild(new Paragraph(new Run(new Text($"Dây chuyền: {line}    Máy: {machine}    Ca: {caSo}"))));
-                body.AppendChild(new Paragraph(new Run(new Text($"Cập nhật: {DateTime.Now:dd/MM/yyyy HH:mm:ss}"))));
-                body.AppendChild(new Paragraph(new Run(new Text(" "))));
-
-                // Table 3 cột: Nhóm | Chỉ số | Giá trị
-                var table = new Table();
-
-                var props = new TableProperties(
-                    new TableBorders(
-                        new TopBorder { Val = BorderValues.Single, Size = 8 },
-                        new BottomBorder { Val = BorderValues.Single, Size = 8 },
-                        new LeftBorder { Val = BorderValues.Single, Size = 8 },
-                        new RightBorder { Val = BorderValues.Single, Size = 8 },
-                        new InsideHorizontalBorder { Val = BorderValues.Single, Size = 8 },
-                        new InsideVerticalBorder { Val = BorderValues.Single, Size = 8 }
-                    )
-                );
-                table.AppendChild(props);
-
-                TableRow Row(string g, string name, string val)
+                // tạo đoạn văn bản 
+                Paragraph Para(string text,
+                    bool bold = false,
+                    int fontSize = 24, // 24=12pt
+                    JustificationValues? just = null,
+                    int leftIndentTwips = 0)
                 {
-                    TableCell Cell(string t) => new TableCell(new Paragraph(new Run(new Text(t ?? ""))));
-                    return new TableRow(Cell(g), Cell(name), Cell(val));
+                    // tạo đoạn văn bản với các thuộc tính định dạng
+                    var p = new Paragraph();
+                    var pPr = new ParagraphProperties();
+                    pPr.Justification = new Justification { Val = just ?? JustificationValues.Left };
+                    if (leftIndentTwips > 0)
+                        pPr.Indentation = new Indentation { Left = leftIndentTwips.ToString() };
+                    p.Append(pPr);
+                    // tạo thuộc tính chạy văn bản
+                    var rPr = new RunProperties();
+                    if (bold) rPr.Append(new Bold());
+                    rPr.Append(new FontSize { Val = fontSize.ToString() });
+                    // thêm văn bản vào đoạn
+                    p.Append(new Run(rPr, new Text(text) { Space = SpaceProcessingModeValues.Preserve }));
+                    return p;
                 }
+                // tạo dòng trống
+                void Blank() => body.Append(Para(" "));
+                // tạo dòng gạch đầu dòng
+                void Bullet(string label, object? val, string suffix = "")
+                    => body.Append(Para($"-    {label}: {V(val)}{suffix}", leftIndentTwips: 720));
+                // tạo ghi chú
+                void Note(string text)
+                {
+                    body.Append(Para($"⇒  {text}", leftIndentTwips: 900));
+                    Blank();
+                }
+                // tạo nội dung báo cáo
+                body.Append(Para("CÔNG TY TNHH MỘT THÀNH VIÊN MASAN HẢI DƯƠNG", bold: true, fontSize: 32, just: JustificationValues.Center));
+                body.Append(Para("BẢNG THÔNG SỐ ĐÁNH GIÁ", bold: true, fontSize: 32, just: JustificationValues.Center));
+                Blank();
 
-                // Header
-                table.AppendChild(Row("Nhóm", "Chỉ số", "Giá trị"));
-
-                // Ví dụ map dữ liệu (bạn thay bằng data thật)
-                string V(object? x) => x?.ToString() ?? "";
+                body.Append(Para($"Dây chuyền: {line}    Máy: {machine}    Ca: {caSo}", fontSize: 24));
+                body.Append(Para($"Cập nhật: {DateTime.Now:dd/MM/yyyy HH:mm:ss}", fontSize: 24));
+                Blank();
 
                 // SẴN SÀNG
-                table.AppendChild(Row("SẴN SÀNG", "MTTR [phút]", V(30)));
-                table.AppendChild(Row("SẴN SÀNG", "MTBF [giờ]", V(20)));
-                table.AppendChild(Row("SẴN SÀNG", "% Dừng máy [%]", V(30)));
-                table.AppendChild(Row("SẴN SÀNG", "% Hỏng máy [%]", V(40)));
-                table.AppendChild(Row("SẴN SÀNG", "Availability Rate [%]", V(45)));
+                body.Append(Para("1.   Độ sẵn sàng", fontSize: 24));
+                Bullet("Chỉ số MTTR", rec.MTTR, " phút");
+                Bullet("Chỉ số MTBF", rec.MTBF, " giờ");
+                Bullet("Phần trăm dừng máy", rec.StopPct, " %");
+                Bullet("Phần trăm hỏng máy", rec.FaultPct, " %");
+                Bullet("Availability Rate", rec.A, " %");
+                Note("Đánh giá nếu trên 90% là tốt, dưới 90% là xấu");
 
-                // ỔN ĐỊNH
-                table.AppendChild(Row("ỔN ĐỊNH", "Tổn thất tốc độ [%]", V(46)));
-                table.AppendChild(Row("ỔN ĐỊNH", "Tốc độ trung bình [gói/phút]", V(57)));
-                table.AppendChild(Row("ỔN ĐỊNH", "% Thời gian dừng nhỏ [%]", V(70)));
-                table.AppendChild(Row("ỔN ĐỊNH", "Performance Rate [%]", V(60)));
+                // ỔN ĐỊNH 
+                body.Append(Para("2.   Đánh giá độ ổn định", fontSize: 24));
+                Bullet("Tổn thất tốc độ", rec.SpeedLossPct, " %");
+                Bullet("Tốc độ trung bình", rec.Vtb, " gói/phút");
+                Bullet("Thời gian dừng nhỏ", rec.MinorStopPct, " %");
+                Bullet("Performance Rate", rec.P, " %");
+                Note("Đánh giá nếu trên 90% là tốt, dưới 90% là xấu");
 
-                // CHẤT LƯỢNG
-                table.AppendChild(Row("CHẤT LƯỢNG", "% Gói cấn gia vị [%]", V(0)));
-                table.AppendChild(Row("CHẤT LƯỢNG", "% Gói rỗng [%]", V(80)));
-                table.AppendChild(Row("CHẤT LƯỢNG", "Quality Rate [%]", V(0)));
+                // CHẤT LƯỢNG 
+                body.Append(Para("3.   Đánh giá chất lượng", fontSize: 24));
+                Bullet("Phần trăm gói cấn gia vị", rec.SpicePct, " %");
+                Bullet("Phần trăm gói rỗng", rec.EmptyPct, " %");
+                Bullet("Quality Rate", rec.Q, " %");
+                Note("Đánh giá nếu trên 90% là tốt, dưới 90% là xấu");
 
-                // HIỆU SUẤT
-                table.AppendChild(Row("HIỆU SUẤT", "% OEE 1 [%]", V(67)));
-                table.AppendChild(Row("HIỆU SUẤT", "% OEE 2 [%]", V(500)));
-                table.AppendChild(Row("HIỆU SUẤT", "% OEE 3 [%]", V(68)));
+                // HIỆU SUẤT 
+                body.Append(Para("4.   Đánh giá tổng thể hiệu suất", fontSize: 24));
+                Bullet("OEE1", rec.OEE1, " %");
+                Bullet("OEE2", rec.OEE2, " %");
+                Bullet("OEE3", rec.OEE3, " %");
 
-                body.AppendChild(table);
+                Blank();
+                body.Append(Para("Người vận hành", fontSize: 24, just: JustificationValues.Right));
+                body.Append(Para("Họ và tên", fontSize: 24, just: JustificationValues.Right));
 
                 main.Document.Save();
             }
-
-            var bytes = ms.ToArray();
+            // trả về file Word đã tạo 
             var fileName = $"BaoCao_PLC_Line{line}_May{machine}_Ca{caSo}_{DateTime.Now:yyyyMMdd_HHmmss}.docx";
-            return File(bytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
+            return File(ms.ToArray(),
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                fileName);
         }
     }
 }
