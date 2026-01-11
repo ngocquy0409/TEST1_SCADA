@@ -17,7 +17,7 @@
 - Khi đọc code, để dễ hiểu, khuyến cáo chúng mày dow cái file zip của git này về rồi giải nén ra, mở bằng VS tím, mỗi đoạn code chỉ cần thêm comment đằng sau cho nó theo kiểu "\\\ " thì nó sẽ tự comment cho đoạn code đó viết cái gì, nội dung ra sao
 - Để chạy được code này thì các con vợ phải cài thêm package của code, khá nhiều, cài ẻ vcl luôn
 - Cài các thư viện như trong ảnh nhé:
-  ![Các package cần cài](<img width="462" height="264" alt="cai_dat_thu_vien" src="https://github.com/user-attachments/assets/18684b6a-3bc4-4867-ab7e-4df59724ba13" />)
+  ![Các package cần cài](images/cai_dat_thu_vien.png)
 
 - Mà muốn chạy thì phải đổi tên cơ sở dữ liệu theo máy của cmay ở phần "appsettings.json" chỗ đoạn có link cơ sở dữ liệu đấy, ko đổi thì bố nào chạy được
 - Nói chung là để chạy đc code này của t trên máy chúng mày thì cũng cần phải tìm cách add các bảng cơ sở dữ liệu lên máy
