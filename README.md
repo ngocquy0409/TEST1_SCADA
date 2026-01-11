@@ -25,8 +25,8 @@
 - Nói chung là để chạy đc code này của t trên máy chúng mày thì cũng cần phải tìm cách add các bảng cơ sở dữ liệu lên máy
 - Code này sử dụng thư viện "Bootstrap" để tạo phần view, nôm na là nó sẽ giống như css cho html, kiểu vậy
 - Cài Bootstrap bằng lệnh: Install-Package Bootstrap
- - Cài NuGet để xuất Excel + Word:
-dotnet add package ClosedXML			=> dùng để tạo excel
-dotnet add package Xceed.Words.NET		=> dùng để tạo word, nhưng phải có license => ko dùng
-dotnet add package DocumentFormat.OpenXml	=> dùng thay thế bằng cái này để tạo word
+- Cài NuGet để xuất Excel + Word:
++ dotnet add package ClosedXML			=> dùng để tạo excel
++ dotnet add package Xceed.Words.NET		=> dùng để tạo word, nhưng phải có license => ko dùng
++ dotnet add package DocumentFormat.OpenXml	=> dùng thay thế bằng cái này để tạo word
 
