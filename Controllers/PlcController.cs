@@ -141,13 +141,14 @@ namespace TEST1_SCADA.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message }); // lỗi server 
             }
         }
+        // đọc dữ liệu từ DB PLC 
         private int ReadDbInt(int db, int dbwOffset)
         {
-            var obj = _plc.Read($"DB{db}.DBW{dbwOffset}");
+            var obj = _plc.Read($"DB{db}.DBW{dbwOffset}");  // đọc dữ liệu từ DB PLC 
             // có thể trả short hoặc ushort tùy
-            if (obj is short s) return s;
-            if (obj is ushort us) return us;
-            return Convert.ToInt32(obj);
+            if (obj is short s) return s;       // nếu là short thì trả về short
+            if (obj is ushort us) return us;    // nếu là ushort thì trả về ushort
+            return Convert.ToInt32(obj);        // nếu không phải short/ushort thì chuyển đổi sang int
         }
 
         // hàm đọc dữ liệu của 1 máy từ DB PLC

@@ -1,29 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Báo cáo PLC";
     Layout = "_Layout";
-
-    // Demo data (sau này thay bằng dữ liệu PLC)
-    var demo = new Dictionary<string, string>
-    {
-        ["MTTR"] = "12.5",
-        ["MTBF"] = "6.2",
-        ["StopPct"] = "8.4",
-        ["FaultPct"] = "2.1",
-        ["A"] = "97.9",
-
-        ["SpeedLossPct"] = "6.8",
-        ["Vtb"] = "245",
-        ["MinorStopPct"] = "5.9",
-        ["P"] = "89.4",
-
-        ["SpicePct"] = "1.7",
-        ["EmptyPct"] = "0.6",
-        ["Q"] = "98.9",
-
-        ["OEE1"] = "86.5",
-        ["OEE2"] = "86.3",
-        ["OEE3"] = "84.9"
-    };
 }
 
 <div class="container py-3">
@@ -38,7 +15,7 @@
             <div class="row g-1 align-items-end">
                 <div class="col-12 col-md-3">
                     <label class="form-label fw-semibold">Dây chuyền</label>
-                    <select class="form-select">
+                    <select id="rpLine" class="form-select">
                         <option>Dây chuyền 1</option>
                         <option>Dây chuyền 2</option>
                         <option>Dây chuyền 3</option>
@@ -48,7 +25,7 @@
 
                 <div class="col-12 col-md-3">
                     <label class="form-label fw-semibold">Máy</label>
-                    <select class="form-select">
+                    <select id="rpMachine" class="form-select">
                         <option>Máy 1</option>
                         <option>Máy 2</option>
                         <option>Máy 3</option>
@@ -58,7 +35,7 @@
 
                 <div class="col-12 col-md-3">
                     <label class="form-label fw-semibold">Ca</label>
-                    <select class="form-select">
+                    <select id="rpShift" class="form-select">
                         <option>Ca 1</option>
                         <option>Ca 2</option>
                         <option>Ca 3</option>
@@ -66,7 +43,7 @@
                 </div>
 
                 <div class="col-12 col-md-2 text-md-end">
-                    <button type="button" class="btn btn-primary px-4">Xem</button>
+                    <button type="button" id="btnReportView" class="btn btn-primary px-4">Xem</button>
                 </div>
             </div>
         </div>
@@ -86,7 +63,7 @@
                         <tr>
                             <th style="width:160px;">Nhóm</th>
                             <th>Chỉ số</th>
-                            <th class="text-end" style="width:240px;">Giá trị (demo)</th>
+                            <th class="text-end" style="width:240px;">Giá trị</th>
                         </tr>
                     </thead>
 
@@ -95,72 +72,102 @@
                         <tr>
                             <td class="fw-bold text-primary text-center align-middle" rowspan="5">SẴN SÀNG</td>
                             <td>MTTR [phút]</td>
-                            <td class="text-end fw-bold">@demo["MTTR"]</td>
+                            <td class="text-end fw-bold">
+                                <span id="vMTTR">--</span>
+                            </td>
                         </tr>
                         <tr>
                             <td>MTBF [giờ]</td>
-                            <td class="text-end fw-bold">@demo["MTBF"]</td>
+                            <td class="text-end fw-bold">
+                                <span id="vMTBF">--</span>
+                            </td>
                         </tr>
                         <tr>
                             <td>% Dừng máy [%]</td>
-                            <td class="text-end fw-bold">@demo["StopPct"]</td>
+                            <td class="text-end fw-bold">
+                                <span id="vStopPct">--</span>
+                            </td>
                         </tr>
                         <tr>
                             <td>% Hỏng máy [%]</td>
-                            <td class="text-end fw-bold">@demo["FaultPct"]</td>
+                            <td class="text-end fw-bold">
+                                <span id="vFaultPct">--</span>
+                            </td>
                         </tr>
                         <tr>
                             <td>Availability Rate [%]</td>
-                            <td class="text-end fw-bold">@demo["A"]</td>
+                            <td class="text-end fw-bold">
+                                <span id="vA">--</span>
+                            </td>
                         </tr>
 
                         <!-- ỔN ĐỊNH -->
                         <tr>
                             <td class="fw-bold text-primary text-center align-middle" rowspan="4">ỔN ĐỊNH</td>
                             <td>Tổn thất tốc độ [%]</td>
-                            <td class="text-end fw-bold">@demo["SpeedLossPct"]</td>
+                            <td class="text-end fw-bold">
+                                <span id="vSpeedLossPct">--</span>
+                            </td>
                         </tr>
                         <tr>
                             <td>Tốc độ trung bình [gói/phút]</td>
-                            <td class="text-end fw-bold">@demo["Vtb"]</td>
+                            <td class="text-end fw-bold">
+                                <span id="vVtb">--</span>
+                            </td>
                         </tr>
                         <tr>
                             <td>% Thời gian dừng nhỏ [%]</td>
-                            <td class="text-end fw-bold">@demo["MinorStopPct"]</td>
+                            <td class="text-end fw-bold">
+                                <span id="vMinorStopPct">--</span>
+                            </td>
                         </tr>
                         <tr>
                             <td>Performance Rate [%]</td>
-                            <td class="text-end fw-bold">@demo["P"]</td>
+                            <td class="text-end fw-bold">
+                                <span id="vP">--</span>
+                            </td>
                         </tr>
 
                         <!-- CHẤT LƯỢNG -->
                         <tr>
                             <td class="fw-bold text-primary text-center align-middle" rowspan="3">CHẤT LƯỢNG</td>
                             <td>% Gói cấn gia vị [%]</td>
-                            <td class="text-end fw-bold">@demo["SpicePct"]</td>
+                            <td class="text-end fw-bold">
+                                <span id="vSpicePct">--</span>
+                            </td>
                         </tr>
                         <tr>
                             <td>% Gói rỗng [%]</td>
-                            <td class="text-end fw-bold">@demo["EmptyPct"]</td>
+                            <td class="text-end fw-bold">
+                                <span id="vEmptyPct">--</span>
+                            </td>
                         </tr>
                         <tr>
                             <td>Quality Rate [%]</td>
-                            <td class="text-end fw-bold">@demo["Q"]</td>
+                            <td class="text-end fw-bold">
+                                <span id="vQ">--</span>
+                            </td>
                         </tr>
 
                         <!-- HIỆU SUẤT -->
                         <tr>
                             <td class="fw-bold text-primary text-center align-middle" rowspan="3">HIỆU SUẤT</td>
                             <td>% OEE 1 [%]</td>
-                            <td class="text-end fw-bold text-success">@demo["OEE1"]</td>
+                            <td class="text-end fw-bold">
+                                <span id="vOEE1">--</span>
+                            </td>
                         </tr>
                         <tr>
                             <td>% OEE 2 [%]</td>
-                            <td class="text-end fw-bold text-success">@demo["OEE2"]</td>
+                            <td class="text-end fw-bold">
+                                <span id="vOEE2">--</span>
+                            </td>
                         </tr>
                         <tr>
                             <td>% OEE 3 [%]</td>
-                            <td class="text-end fw-bold text-success">@demo["OEE3"]</td>
+                            <td class="text-end fw-bold">
+                                <span id="vOEE3">--</span>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -180,5 +187,81 @@
         const d = new Date();
         document.getElementById("updatedAt").textContent =
             `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+    </script>
+    @*JS cho nút "XEM" (Gọi PLC để đọc dữ liệu lên bảng)*@
+    <script>
+        const $ = (id) => document.getElementById(id);
+
+        function setText(id, val) {
+          const el = $(id);
+          if (el) el.textContent = (val ?? "--");
+        }
+        let plcConnected = false;
+
+        async function connectPlc() {
+          const r = await fetch("/plc/connect", { method: "POST" });
+          const j = await r.json().catch(()=> ({}));
+          plcConnected = (!!j.success && r.ok);
+          $("btnReportView").disabled = !plcConnected;
+          return { ok: plcConnected, msg: j.status || "" };
+        }
+
+        function parseNum(selectId, fallback = 1) {
+          const t = $(selectId)?.value || "";
+          const m = t.match(/\d+/);
+          return m ? Number(m[0]) : fallback;
+        }
+
+        async function loadReportFromPlc() {
+          const line = parseNum("rpLine", 1);
+          const machine = parseNum("rpMachine", 1);
+          const caSo = parseNum("rpShift", 1);
+
+          const c = await connectPlc();
+          if (!c.ok) {
+            alert("Kết nối PLC thất bại: " + c.msg);
+            return;
+          }
+
+          const url = `/Report/ReadSave?line=${encodeURIComponent(line)}&machine=${encodeURIComponent(machine)}&caSo=${encodeURIComponent(caSo)}`;
+          const r = await fetch(url, { cache: "no-store" });
+          const j = await r.json();
+
+         if (!j.ok) {
+            alert(j.message || "Chưa kết nối đến PLC!");
+            return;
+        }
+
+          const d = j.data;
+          if (!d) {
+            alert("Không có j.data để fill bảng.");
+            return;
+          }
+
+          setText("updatedAt", j.updatedAt);
+
+          setText("vMTTR", d.mttr);
+          setText("vMTBF", d.mtbf);
+          setText("vStopPct", d.stopPct);
+          setText("vFaultPct", d.faultPct);
+          setText("vA", d.a);
+
+          setText("vSpeedLossPct", d.speedLossPct);
+          setText("vVtb", d.vtb);
+          setText("vMinorStopPct", d.minorStopPct);
+          setText("vP", d.p);
+
+          setText("vSpicePct", d.spicePct);
+          setText("vEmptyPct", d.emptyPct);
+          setText("vQ", d.q);
+
+          setText("vOEE1", d.oeE1);
+          setText("vOEE2", d.oeE2);
+          setText("vOEE3", d.oeE3);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+          document.getElementById("btnReportView")?.addEventListener("click", loadReportFromPlc);
+        });
     </script>
 }

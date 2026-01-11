@@ -399,7 +399,7 @@
             return { ok: !!j.success, msg: j.status || "" };
           }
 
-          // ✅ fill 1 máy theo index i=1..4
+          // fill 1 máy theo index i=1..4
           function fillMachine(i, j) {
             setVal(`m${i}_speed`,    j[`M${i}_Speed`]);
             setVal(`m${i}_oee`,      j[`M${i}_Oee`]);
@@ -447,7 +447,6 @@
 
             if (timer) clearInterval(timer);
 
-            // đổi từ readDb3ToMachine1Once -> readAllMachinesOnce
             await readAllMachinesOnce();
             timer = setInterval(readAllMachinesOnce, ms);
 
