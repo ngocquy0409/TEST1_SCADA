@@ -13,3 +13,5 @@
 [https://drive.google.com/drive/folders/18_1GirnJFnhpheAmMG6UFb6MjHGpGdj1?usp=drive_link](https://drive.google.com/drive/folders/18_1GirnJFnhpheAmMG6UFb6MjHGpGdj1?usp=drive_link)
 - Nên đọc trước cái file docs có tên "Cài Đặt + Setup + Các kiểu hay dùng trong MVC ( nên đọc trước)" nhé
 - Chúc các con vợ đọc code đéo hiểu mẹ gì!!!
+# LƯU Ý CỰC KỲ KINH KHỦNG:
+- Khi đọc code, để dễ hiểu, khuyến cáo chúng mày dow cái file zip của git này về rồi giải nén ra, mở bằng VS tím, mỗi đoạn code chỉ cần thêm comment đằng sau cho nó theo kiểu "\\ " thì nó sẽ tự comment cho đoạn code đó viết cái gì, nội dung ra sao
