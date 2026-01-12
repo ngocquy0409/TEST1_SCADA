@@ -167,6 +167,7 @@ namespace TEST1_SCADA.Controllers
         [HttpPost]
         public IActionResult SaveProductionInput([FromBody] SaveProductionInputDto? dto)
         {
+            // lưu 
             if (dto == null) return BadRequest("DTO null - sai JSON");
             if (dto.SanPhamId <= 0) return BadRequest("Chưa chọn sản phẩm");
             if (dto.CaSo < 1 || dto.CaSo > 3) return BadRequest("Ca không hợp lệ");
@@ -227,8 +228,6 @@ namespace TEST1_SCADA.Controllers
             if (ps == null)
                 return Ok(new { ok = false, message = "Chưa có cấu hình trong ParameterSettings cho sản phẩm này" });
 
-            // ====== MAP dữ liệu từ ParameterSettings sang form Nhập sản lượng ======
-            // ps.Ca đang là string: "Ca 1" / "Ca 2" / "Ca 3"
             int caSo = 1;
             if (!string.IsNullOrWhiteSpace(ps.Ca))
             {
@@ -237,7 +236,7 @@ namespace TEST1_SCADA.Controllers
                 else caSo = 1;
             }
 
-            // ps.TenDayChuyen thường là "Dây chuyền 1" còn dropdown của bạn là "Line 1"
+            // ps.TenDayChuyen thường là "Dây chuyền 1" còn dropdown là "Line 1"
             string dayChuyen = MapDayChuyen(ps.TenDayChuyen);
 
             // ps.TenMay: "Máy 1"..."Máy 4"
@@ -258,7 +257,7 @@ namespace TEST1_SCADA.Controllers
                 }
             });
 
-            // ===== local functions =====
+            //  local functions
             static string MapDayChuyen(string? tenDayChuyen)
             {
                 if (string.IsNullOrWhiteSpace(tenDayChuyen)) return "";
