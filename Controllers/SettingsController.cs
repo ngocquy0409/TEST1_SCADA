@@ -301,17 +301,18 @@ namespace TEST1_SCADA.Controllers
         [HttpPost]
         public IActionResult SaveParameterSetting([FromBody] SaveParameterSettingDto dto)
         {
+            // bắt lỗi dữ liệu đầu vào từ client
             if (dto.TocDoChuan <= 0 || dto.ThoiGianDungMay <= 0 || dto.ThoiGianChapNhanGoi <= 0
              || dto.ThoiGianGoiCan <= 0 || dto.ThoiGianDayGoiCan <= 0 || dto.ThoiGianCapNhatTuPLC <= 0)
             {
+                // nếu có bất kỳ tham số nào không phải số nguyên dương (>0) thì trả về lỗi
                 return BadRequest(new { ok = false, message = "Thông số phải là số nguyên dương (>0)." });
             }
-
-
+            // tìm sản phẩm theo SanPhamId để lấy mã và tên sản phẩm
             SanPham? sp = null;
             if (dto.SanPhamId.HasValue && dto.SanPhamId.Value > 0)
                 sp = _context.SanPham.FirstOrDefault(x => x.Id == dto.SanPhamId.Value);
-
+            // tạo đối tượng ParameterSetting mới để lưu vào DB
             var row = new ParameterSetting
             {
                 CaiDatThamSo = dto.CaiDatThamSo,
@@ -342,6 +343,7 @@ namespace TEST1_SCADA.Controllers
         [HttpGet]
         public IActionResult GetLatestParameterSetting()
         {
+            // lấy cấu hình tham số mới nhất (theo Id lớn nhất)
             var last = _context.ParameterSettings
                 .OrderByDescending(x => x.Id)
                 .Select(x => new {

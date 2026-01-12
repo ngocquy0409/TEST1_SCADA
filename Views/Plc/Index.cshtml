@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Giám sát";
+    ViewBag["Messagae"] = "Xin chào";
 }
 
 <style>
@@ -67,6 +68,34 @@
     .status-disconnected {
         color: #dc2626;
     }
+    /* Máy 1 & 3: xanh dương */
+    .machine-blue {
+        border-color: #1d4ed8 !important;
+    }
+
+        .machine-blue .card-header {
+            background: #3b82f6 !important;
+            color: #fff !important;
+        }
+
+        .machine-blue .card-body {
+            background: #eff6ff; /* xanh dương nhạt */
+        }
+
+    /* Máy 2 & 4: xanh đậm */
+    .machine-navy {
+        border-color: darkgreen !important;
+    }
+
+        .machine-navy .card-header {
+            background: darkgreen !important;
+            color: #fff !important;
+        }
+
+        .machine-navy .card-body {
+            background: #e2e8f0; /* xám xanh nhạt để dễ nhìn */
+        }
+
 </style>
 
 <div class="container-fluid py-3" style="background:#eef6ff; min-height: calc(100vh - 120px);">
@@ -126,7 +155,7 @@
 
                     <div class="mt-3">
                         <label class="form-label fw-bold">Chu kỳ đọc (ms)</label>
-                        <input id="pollMs" type="number" class="form-control" value="1000" min="200" step="100" />
+                        <input id="pollMs" type="number" class="form-control" readonly/>
                     </div>
 
                     <div class="mt-3">
@@ -219,8 +248,9 @@
     <div class="row g-3 mt-1">
         @for (int i = 1; i <= 4; i++)
         {
+            var isOdd = (i % 2 == 1); // 1,3, tạo lớp xanh dương; 2,4 tạo lớp xanh đậm
             <div class="col-12 col-md-6 col-xl-3">
-                <div class="card shadow-sm border-primary h-100">
+                <div class="card shadow-sm border-primary h-100 @(isOdd ? "machine-blue" : "machine-navy")">
                     <div class="card-header bg-info text-dark fw-bold text-center">
                         Máy @i
                     </div>
@@ -321,7 +351,7 @@
             const machine = parseInt(machineEl.value || "1");
             const caText = shiftEl.value || "Ca 1";
             const caSo = parseCaSo(caText);
-            const pollMs = parseInt(pollEl.value || "1000");
+            
 
             setText("lineTitle", `Dây chuyền ${line}`);
             setText("lineTitleText", `Dây chuyền ${line}`);
@@ -333,7 +363,7 @@
               const res = await fetch("/plc/monitor/context", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ line, machine, caSo, pollMs })
+                body: JSON.stringify({ line, machine, caSo})
               });
 
               const j = await res.json();
@@ -345,6 +375,11 @@
                 setText("productCode", "---");
                 return;
               }
+                      if (j.pollMs != null) {
+          pollEl.value = j.pollMs;
+          // nếu đang chạy thì restart timer theo poll mới (xem mục 2)
+          window.__restartMonitorTimer?.();
+        }
 
               setText("leaderName", j.leaderName || "---");
               setText("leaderCode", j.leaderCode || "---");
@@ -362,7 +397,7 @@
           document.getElementById("lineSelect")?.addEventListener("change", updateRunningInfo);
           document.getElementById("machineSelect")?.addEventListener("change", updateRunningInfo);
           document.getElementById("shiftSelect")?.addEventListener("change", updateRunningInfo);
-          document.getElementById("pollMs")?.addEventListener("change", updateRunningInfo);
+
 
           updateRunningInfo();
         });
@@ -371,6 +406,17 @@
     <script>
         (() => {
           let timer = null;
+                  let isRunning = false;
+
+        // expose để script khác gọi
+        window.__restartMonitorTimer = () => {
+          if (!isRunning || !timer) return;
+
+          clearInterval(timer);
+          const ms = Math.max(200, Number($("pollMs")?.value || 1000));
+          timer = setInterval(readAllMachinesOnce, ms);
+        };
+
           const $ = (id) => document.getElementById(id);
 
           function setConn(isOk, text) {
@@ -433,6 +479,7 @@
 
           async function start() {
             const ms = Math.max(200, Number($("pollMs")?.value || 1000));
+            isRunning = true;
 
             setConn(false, "Connecting...");
 
@@ -457,6 +504,7 @@
           function stop() {
             if (timer) clearInterval(timer);
             timer = null;
+            isRunning = false;
 
             $("btnStart") && ($("btnStart").disabled = false);
             $("btnStop") && ($("btnStop").disabled = true);

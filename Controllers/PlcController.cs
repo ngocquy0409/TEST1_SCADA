@@ -108,7 +108,7 @@ namespace TEST1_SCADA.Controllers
                     Line = req.Line,                // 1..4
                     Machine = req.Machine,          // 1..4
                     CaSo = req.CaSo,                // 1..3
-                    PollMs = req.PollMs,            // chu kỳ đọc ms
+                    // PollMs = req.PollMs,            // chu kỳ đọc ms
 
                     SanPhamId = ps?.SanPhamId,      // lấy SanPhamId từ ParameterSettings
                     TruongCaId = sc?.TruongCaId     // lấy TruongCaId từ ShiftConfigs
@@ -116,7 +116,7 @@ namespace TEST1_SCADA.Controllers
 
                 _db.MonitorRecords.Add(record);
                 await _db.SaveChangesAsync();
-
+                
                 // trả về context đã resolve tên (để fill UI)
                 var sanPham = record.SanPhamId != null          // lấy mã/tên sp theo SanPhamId
                     ? await _db.SanPham.FirstOrDefaultAsync(x => x.Id == record.SanPhamId)
@@ -125,6 +125,7 @@ namespace TEST1_SCADA.Controllers
                 var truongCa = record.TruongCaId != null        // lấy tên trưởng ca theo TruongCaId
                     ? await _db.TruongCa.FirstOrDefaultAsync(x => x.Id == record.TruongCaId)
                     : null;
+                var pollMs = Math.Max(200, (ps?.ThoiGianCapNhatTuPLC ?? 1) * 1000);   // tính PollMs từ tham số người dùng (tối thiểu 200ms)
                 // trả về kết quả
                 return Json(new
                 {
@@ -133,7 +134,8 @@ namespace TEST1_SCADA.Controllers
                     productCode = sanPham?.MaSanPham ?? "",     // mã sản phẩm
                     productName = sanPham?.TenSanPham ?? "",    // tên sản phẩm
                     leaderCode = truongCa?.MaTruongCa ?? "",    // mã trưởng ca
-                    leaderName = truongCa?.HovaTen ?? truongCa?.HovaTen ?? "" // tên trưởng ca 
+                    leaderName = truongCa?.HovaTen ?? truongCa?.HovaTen ?? "", // tên trưởng ca 
+                    pollMs = pollMs
                 });
             }
             catch (Exception ex)
@@ -204,7 +206,7 @@ namespace TEST1_SCADA.Controllers
                     : null;
 
                 // trả DTO cho UI 
-                var dto = new MonitorLiveDto
+                var dto = new MonitorLiveDto        // tao DTO trả về UI 
                 {
                     ok = true,
                     updatedAt = DateTime.Now.ToString("HH:mm:ss"),
@@ -256,12 +258,13 @@ namespace TEST1_SCADA.Controllers
                     M4_Empty = m4.Empty,
                 };
                 // tạo biến 
+                var pollMs = Math.Max(200, (ps?.ThoiGianCapNhatTuPLC ?? 1) * 1000);
                 var rec = new MonitorRecord
                 {
                     Line = line,
                     Machine = machine,
                     CaSo = caSo,
-                    PollMs = 1000,
+                    PollMs = pollMs,
                     CreatedAt = DateTime.Now,
                     TruongCaId = sc?.TruongCaId,
                     SanPhamId = ps?.SanPhamId,
