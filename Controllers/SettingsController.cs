@@ -301,7 +301,12 @@ namespace TEST1_SCADA.Controllers
         [HttpPost]
         public IActionResult SaveParameterSetting([FromBody] SaveParameterSettingDto dto)
         {
-            if (dto == null) return BadRequest("DTO null");
+            if (dto.TocDoChuan <= 0 || dto.ThoiGianDungMay <= 0 || dto.ThoiGianChapNhanGoi <= 0
+             || dto.ThoiGianGoiCan <= 0 || dto.ThoiGianDayGoiCan <= 0 || dto.ThoiGianCapNhatTuPLC <= 0)
+            {
+                return BadRequest(new { ok = false, message = "Thông số phải là số nguyên dương (>0)." });
+            }
+
 
             SanPham? sp = null;
             if (dto.SanPhamId.HasValue && dto.SanPhamId.Value > 0)

@@ -1,4 +1,5 @@
-﻿
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -11,7 +12,11 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
 </head>
-
+@{
+        var user = await UserManager.GetUserAsync(User);
+        var isAdmin = user != null && await UserManager.IsInRoleAsync(user, "Admin");
+            
+}
 <body class="d-flex flex-column min-vh-100" style="padding-top:70px;">
     @{
         var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
@@ -56,34 +61,36 @@
                     {
 
                         @* MENU CHÍNH *@
-                        <li class="nav-item">
-                            <a class="nav-link @(currentController == "Plc" ? "active fw-bold" : "")"
-                            asp-controller="Plc"
-                            asp-action="Index">
-                                Giám sát
-                            </a>
-                        </li>
+                        @if(isAdmin)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "Plc" ? "active fw-bold" : "")"
+                                   asp-controller="Plc"
+                                   asp-action="Index">
+                                    Giám sát
+                                </a>
+                            </li>
 
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "Settings" ? "active fw-bold" : "")"
+                                   asp-controller="Settings"
+                                   asp-action="Index">
+                                    Cài đặt
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "Products" ? "active fw-bold" : "")"
+                                   asp-controller="Products"
+                                   asp-action="Index">
+                                    Sản phẩm
+                                </a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link @(currentController == "Report" ? "active fw-bold" : "")"
-                            asp-controller="Report"
-                            asp-action="Index">
+                               asp-controller="Report"
+                               asp-action="Index">
                                 Lấy báo cáo
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link @(currentController == "Settings" ? "active fw-bold" : "")"
-                            asp-controller="Settings"
-                            asp-action="Index">
-                                Cài đặt
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link @(currentController == "Products" ? "active fw-bold" : "")"
-                            asp-controller="Products"
-                            asp-action="Index">
-                                Sản phẩm
                             </a>
                         </li>
 

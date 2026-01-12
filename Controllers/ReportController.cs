@@ -83,11 +83,9 @@ namespace TEST1_SCADA.Controllers
             try
             {
                 EnsureConnected();
-
+                // đọc dữ liệu từ PLC
                 var db = GetReportDbByMachine(machine);
-
-                // Offset ví dụ (bạn sửa theo DB thật)
-                var rec = new ReportRecord
+                var rec = new ReportRecord              // tạo bản ghi mới
                 {
                     Line = line,
                     Machine = machine,
@@ -113,12 +111,13 @@ namespace TEST1_SCADA.Controllers
                     OEE2 = ReadDbDec10(db, 26),
                     OEE3 = ReadDbDec10(db, 28),
                 };
-
+                // lưu bản ghi vào DB
                 _db.ReportRecords.Add(rec);
-                await _db.SaveChangesAsync();
-
+                await _db.SaveChangesAsync(); // lưu thay đổi vào DB
+                // trả về kết quả dưới dạng JSON 
                 return Json(new { ok = true, updatedAt = DateTime.Now.ToString("HH:mm:ss"), data = rec });
             }
+            // bắt lỗi và ghi log
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Report ReadSave failed");

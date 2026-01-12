@@ -83,7 +83,9 @@
                 <label for="paramTocDo" class="form-label fw-bold mb-0">Tốc độ chuẩn [gói/phút]</label>
             </div>
             <div class="col-7">
-                <input type="text" id="paramTocDo" name="paramTocDo" class="form-control" placeholder="Nhập tốc độ chuẩn" />
+                <input type="number" min="0" id="paramTocDo" name="paramTocDo"
+                       class="form-control pos-int" inputmode="numeric" autocomplete="off"
+                       placeholder="Nhập tốc độ chuẩn > 0" />
             </div>
         </div>
 
@@ -92,7 +94,9 @@
                 <label for="paramDungMay" class="form-label fw-bold mb-0"> Thời gian dừng máy [s] </label>
             </div>
             <div class="col-7">
-                <input type="text" id="paramDungMay" name="paramDungMay" class="form-control" placeholder="Nhập thời gian dừng máy" />
+                <input type="number" min="0" id="paramDungMay" name="paramDungMay"
+                       class="form-control pos-int" inputmode="numeric" autocomplete="off"
+                       placeholder="Nhập thời gian dừng máy > 0" />
             </div>
         </div>
 
@@ -102,7 +106,9 @@
                 <label for="paramChapNhan" class="form-label fw-bold mb-0"> Thời gian chấp nhận gói [x0.1s] </label>
             </div>
             <div class="col-7">
-                <input type="text" id="paramChapNhan" name="paramChapNhan" class="form-control" placeholder="Nhập thời gian chấp nhận gói" />
+                <input type="number" min="0" id="paramChapNhan" name="paramChapNhan"
+                       class="form-control pos-int" inputmode="numeric" autocomplete="off"
+                       placeholder="Nhập thời gian chấp nhận gói > 0" />
             </div>
         </div>
 
@@ -111,7 +117,9 @@
                 <label for="paramGoiCan" class="form-label fw-bold mb-0"> Thời gian gói cân [x0.1s] </label>
             </div>
             <div class="col-7">
-                <input type="text" id="paramGoiCan" name="paramGoiCan" class="form-control" placeholder="Nhập thời gian gói cân" />
+                <input type="number" min="0" id="paramGoiCan" name="paramGoiCan"
+                       class="form-control pos-int" inputmode="numeric" autocomplete="off"
+                       placeholder="Nhập thời gian gói cân > 0" />
             </div>
         </div>
 
@@ -120,7 +128,9 @@
                 <label for="paramDayGoiCan" class="form-label fw-bold mb-0"> Thời gian đẩy gói cân [x0.1s]</label>
             </div>
             <div class="col-7">
-                <input type="text" id="paramDayGoiCan" name="paramDayGoiCan" class="form-control" placeholder="Nhập thời gian đẩy gói cân" />
+                <input type="number" min="0" id="paramDayGoiCan" name="paramDayGoiCan"
+                       class="form-control pos-int" inputmode="numeric" autocomplete="off"
+                       placeholder="Nhập thời gian đẩy gói cân > 0" />
             </div>
         </div>
 
@@ -129,7 +139,9 @@
                 <label for="paramCapNhatPLC" class="form-label fw-bold mb-0"> Thời gian cập nhật từ PLC [s]</label>
             </div>
             <div class="col-7">
-                <input type="text" id="paramCapNhatPLC" name="paramCapNhatPLC" class="form-control" placeholder="Nhập thời gian cập nhật từ PLC" />
+                <input type="number" min="0" id="paramCapNhatPLC" name="paramCapNhatPLC"
+                       class="form-control pos-int" inputmode="numeric" autocomplete="off"
+                       placeholder="Nhập thời gian cập nhật từ PLC > 0" />
             </div>
         </div>
     </div>
@@ -150,17 +162,88 @@
 <!-- BUTTON -->
 <div class="text-center mb-3">
     <button type="button" id="btnSaveParam" class="btn btn-success me-2 px-4">
-    Thiết Lập
+        Thiết Lập
     </button>
     <button type="button" id="btnWritePlc" class="btn btn-success px-4">
-    Ghi Xuống
+        Ghi Xuống
     </button>
 </div>
 
-<!-- THOÁT -->
-<div class="text-center">
-    <button type="button" class="btn btn-warning px-5 fw-bold">Thoát</button>
-</div>
+@section Scripts {
+    <script>
+        const POS_INT = /^[1-9]\d*$/;
 
+        function showInvalid(el, msg) {
+          el.classList.add("is-invalid");
+          let fb = el.nextElementSibling;
+          if (!fb || !fb.classList.contains("invalid-feedback")) {
+            fb = document.createElement("div");
+            fb.className = "invalid-feedback";
+            el.insertAdjacentElement("afterend", fb);
+          }
+          fb.textContent = msg || "Vui lòng nhập số nguyên dương.";
+        }
+
+        function clearInvalid(el) {
+          el.classList.remove("is-invalid");
+          const fb = el.nextElementSibling;
+          if (fb && fb.classList.contains("invalid-feedback")) fb.textContent = "";
+        }
+
+        function validatePosInt(el) {
+          const v = (el.value || "").trim();
+
+          if (v === "") { showInvalid(el, "Không được để trống."); return false; }
+
+          // bắt mọi trường hợp có dấu '-' hoặc '.' hoặc chữ
+          if (!POS_INT.test(v)) {
+            showInvalid(el, "Chỉ được nhập số nguyên dương (1,2,3...). Không nhập số âm/chữ/thập phân.");
+            return false;
+          }
+
+          clearInvalid(el);
+          return true;
+        }
+
+        // chỉ cho phép nhập: 0-9 và dấu '-' (để còn bắt lỗi), còn lại bỏ
+        function sanitize(el) {
+          let v = el.value || "";
+          v = v.replace(/[^\d-]/g, "");     // bỏ chữ cái
+          v = v.replace(/(?!^)-/g, "");     // chỉ cho '-' xuất hiện ở đầu
+          el.value = v;
+        }
+
+        function validateAllPosInt() {
+          const inputs = document.querySelectorAll("input.pos-int");
+          let ok = true;
+          inputs.forEach(el => { if (!validatePosInt(el)) ok = false; });
+          return ok;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+          document.querySelectorAll("input.pos-int").forEach(el => {
+            el.addEventListener("input", () => {
+              sanitize(el);
+              validatePosInt(el);
+            });
+            el.addEventListener("blur", () => validatePosInt(el));
+          });
+
+          // chặn chắc cả Thiết lập + Ghi xuống (kể cả handler ở file JS khác)
+          document.addEventListener("click", (e) => {
+            const id = e.target?.id;
+            if (id !== "btnSaveParam" && id !== "btnWritePlc") return;
+
+            if (!validateAllPosInt()) {
+              e.preventDefault();
+              e.stopPropagation();
+              e.stopImmediatePropagation();
+              alert("Vui lòng nhập đúng SỐ NGUYÊN DƯƠNG cho tất cả thông số!");
+            }
+          }, true);
+        });
+    </script>
+
+}
 
 

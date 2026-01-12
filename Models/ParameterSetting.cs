@@ -1,4 +1,6 @@
-﻿namespace TEST1_SCADA.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TEST1_SCADA.Models
 {
     public class ParameterSetting
     {
@@ -14,7 +16,6 @@
         public string TenSanPham { get; set; } = "";
 
         public bool CaiDatThamSo { get; set; } = true;  // radio: Cài đặt / Không cài đặt
-
         public int? TocDoChuan { get; set; }            // gói/phút
         public int? ThoiGianDungMay { get; set; }       // s
         public int? ThoiGianChapNhanGoi { get; set; }   // x0.1s
