@@ -15,6 +15,7 @@
 @{
         var user = await UserManager.GetUserAsync(User);
         var isAdmin = user != null && await UserManager.IsInRoleAsync(user, "Admin");
+        var isOperator = user != null && await UserManager.IsInRoleAsync(user, "Operator");
             
 }
 <body class="d-flex flex-column min-vh-100" style="padding-top:70px;">
@@ -61,7 +62,7 @@
                     {
 
                         @* MENU CHÍNH *@
-                        @if(isAdmin)
+                        @if(isAdmin || isOperator)
                         {
                             <li class="nav-item">
                                 <a class="nav-link @(currentController == "Plc" ? "active fw-bold" : "")"
@@ -71,6 +72,16 @@
                                 </a>
                             </li>
 
+                            <li class="nav-item">
+                                <a class="nav-link @(currentController == "Report" ? "active fw-bold" : "")"
+                                   asp-controller="Report"
+                                   asp-action="Index">
+                                    Lấy báo cáo
+                                </a>
+                            </li>
+                        }
+                        @if (isOperator)
+                        {
                             <li class="nav-item">
                                 <a class="nav-link @(currentController == "Settings" ? "active fw-bold" : "")"
                                    asp-controller="Settings"
@@ -86,13 +97,6 @@
                                 </a>
                             </li>
                         }
-                        <li class="nav-item">
-                            <a class="nav-link @(currentController == "Report" ? "active fw-bold" : "")"
-                               asp-controller="Report"
-                               asp-action="Index">
-                                Lấy báo cáo
-                            </a>
-                        </li>
 
                         @* USER INFO *@
                         <li class="nav-item dropdown ms-3">

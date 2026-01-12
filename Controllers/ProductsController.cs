@@ -91,7 +91,7 @@ namespace TEST1_SCADA.Controllers
 
             return View(sp);
         }
-
+        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
