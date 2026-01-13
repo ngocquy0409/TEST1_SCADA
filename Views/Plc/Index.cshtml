@@ -96,22 +96,24 @@
             background: #dcfce7; /* xanh lá nhạt */
         }
     /*Màu sắc cho trạng thái máy*/
-    .machine-status-ok {
-        background: #eaf7ef;
+    .machine-stop {
+        background-color: #d1e7dd;
+        border: 2px solid #198754;
     }
 
-    .machine-status-warn {
-        background: #fff7e6;
+    .machine-run {
+        background-color: #cff4fc;
+        border: 2px solid #0d6efd;
     }
 
-    .machine-status-bad {
-        background: #ffecec;
+    .machine-unknown {
+        background-color: #f1f3f5;
+        border: 2px solid #adb5bd;
     }
 </style>
 
 <div class="container-fluid py-3" style="background:#eef6ff; min-height: calc(100vh - 120px);">
-    <!-- TOP -->
-    <!-- TOP -->
+
     <div class="row g-3 align-items-start">
         <!-- Left control -->
         <div class="col-12 col-lg-4">
@@ -261,9 +263,8 @@
                             <div class="row g-3">
                                 @for (int i = 1; i <= 4; i++)
                                 {
-                                    var isOdd = (i % 2 == 1); 
                                     <div class="col-12 col-md-6 col-xl-3">
-                                         <div class="border rounded-3 p-3 h-100 @(isOdd ? "machine-blue" : "machine-navy")">
+                                        <div class="border rounded-3 p-3 h-100 machine-box machine-unknown" id="machineBox@(i)">
                                             <div class="d-flex justify-content-between align-items-center mb-2">
                                                 <div class="fw-bold">Máy @i</div>
                                                 
@@ -275,7 +276,7 @@
                                             <hr class="my-2" />
 
                                             <div class="small text-muted mb-1">Mô tả</div>
-                                            <div id="st_desc_m@(i)" class="fw-semibold">--</div>
+                                            <div id="st_desc_m@(i)" class="fw-semibold">Unkown</div>
                                         </div>
                                     </div>
                                 }
@@ -567,55 +568,85 @@
 
         function setText(id, val) {
           const el = $(id);
-          if (el) el.textContent = (val ?? "--");
+          if (el) el.textContent = (val ?? "Unknown");
         }
 
         function getLine() {
-          // lineSelect của bạn là select 1..4
           const v = $("lineSelect")?.value || "1";
           const n = parseInt(v, 10);
           return Number.isFinite(n) ? n : 1;
         }
 
-        function statusDesc(s) {
-          if (s === "RUN") return "Máy đang chạy";
-          if (s === "STOP") return "Máy đang dừng";
-          return "Chưa kết nối PLC";
+        function setMachineUI(i, status, line) {
+          const box = $(`machineBox${i}`);
+          const desc = $(`st_desc_m${i}`);
+          const lineEl = $(`st_line_m${i}`);
+
+          if (!box) return;
+
+          box.classList.remove("machine-run","machine-stop","machine-unknown");
+
+          if (status === "RUN") {
+            box.classList.add("machine-run");
+            desc.textContent = "RUN - Máy đang chạy";
+          }
+          else if (status === "STOP") {
+            box.classList.add("machine-stop");
+            desc.textContent = "STOP - Máy đang dừng";
+          }
+          else {
+            box.classList.add("machine-unknown");
+            desc.textContent = "Unknown";
+          }
+
+          if (lineEl) lineEl.textContent = `Dây chuyền ${line}`;
+        }
+
+        async function isPlcConnected() {
+          const r = await fetch("/plc/status", { cache: "no-store" });
+          const j = await r.json().catch(()=>({}));
+          return !!j.connected;
         }
 
         async function loadMachineStatus() {
           const line = getLine();
           setText("statusLineText", line);
 
-          const r = await fetch(`/plc/machine-status?line=${encodeURIComponent(line)}`, { cache: "no-store" });
-          const j = await r.json().catch(() => null);
-
-          if (!j || !j.ok) {
+          const connected = await isPlcConnected();
+          if (!connected) {
             for (let i = 1; i <= 4; i++) {
-              setText(`st_line_m${i}`, `Dây chuyền ${line}`);
-              setText(`st_desc_m${i}`, "--");
+              setMachineUI(i, "UNKNOWN", line);
             }
             return;
           }
 
-          const arr = [j.m1, j.m2, j.m3, j.m4];
-          for (let i = 1; i <= 4; i++) {
-            const st = arr[i - 1];
-            setText(`st_line_m${i}`, `Dây chuyền ${line}`);
-            setText(`st_desc_m${i}`, `${st} - ${statusDesc(st)}`);
+          const r = await fetch(`/plc/machine-status?line=${line}`, { cache: "no-store" });
+          const j = await r.json().catch(()=>null);
+
+          if (!j || !j.ok) {
+            for (let i = 1; i <= 4; i++) {
+              setMachineUI(i, "UNKNOWN", line);
+            }
+            return;
           }
+
+          setMachineUI(1, j.m1, line);
+          setMachineUI(2, j.m2, line);
+          setMachineUI(3, j.m3, line);
+          setMachineUI(4, j.m4, line);
         }
 
         document.addEventListener("DOMContentLoaded", () => {
+          for (let i = 1; i <= 4; i++) {
+            setMachineUI(i, "UNKNOWN", getLine());
+          }
+
           loadMachineStatus();
-
-          // đổi dây chuyền cập nhật ngay
           $("lineSelect")?.addEventListener("change", loadMachineStatus);
-
-          // auto refresh mỗi 1s (đổi theo pollMs nếu muốn)
           setInterval(loadMachineStatus, 1000);
         });
     </script>
+
 
 }
 

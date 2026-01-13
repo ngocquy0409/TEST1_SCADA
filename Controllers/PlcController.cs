@@ -368,6 +368,13 @@ namespace TEST1_SCADA.Controllers
                 return Json(new { ok = false, message = ex.Message });
             }
         }
+        // đảm bảo trạng thái kết nối đến PLC
+        [HttpGet("status")]
+        public IActionResult Status()
+        {
+            return Json(new { connected = _plc != null && _plc.IsConnected });
+        }
+
 
     }
 }
