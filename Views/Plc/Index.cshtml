@@ -95,7 +95,18 @@
         .machine-navy .card-body {
             background: #dcfce7; /* xanh lá nhạt */
         }
+    /*Màu sắc cho trạng thái máy*/
+    .machine-status-ok {
+        background: #eaf7ef;
+    }
 
+    .machine-status-warn {
+        background: #fff7e6;
+    }
+
+    .machine-status-bad {
+        background: #ffecec;
+    }
 </style>
 
 <div class="container-fluid py-3" style="background:#eef6ff; min-height: calc(100vh - 120px);">
@@ -234,6 +245,40 @@
                                 <span id="lineTitle" class="badge bg-primary fs-6 px-4 py-2">
                                     Dây chuyền 1
                                 </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- TRẠNG THÁI MÁY THEO DÂY CHUYỀN -->
+                    <div class="card shadow-sm border-primary mt-3">
+                        <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between align-items-center">
+                            <span>Trạng thái máy</span>
+                            <span class="small opacity-75">
+                                Dây chuyền: <span id="statusLineText">--</span>
+                            </span>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row g-3">
+                                @for (int i = 1; i <= 4; i++)
+                                {
+                                    var isOdd = (i % 2 == 1); 
+                                    <div class="col-12 col-md-6 col-xl-3">
+                                         <div class="border rounded-3 p-3 h-100 @(isOdd ? "machine-blue" : "machine-navy")">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <div class="fw-bold">Máy @i</div>
+                                                
+                                            </div>
+
+                                            <div class="small text-muted mb-1">Dây chuyền đang chọn</div>
+                                            <div class="fw-semibold" id="st_line_m@(i)">--</div>
+
+                                            <hr class="my-2" />
+
+                                            <div class="small text-muted mb-1">Mô tả</div>
+                                            <div id="st_desc_m@(i)" class="fw-semibold">--</div>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
@@ -515,6 +560,61 @@
           $("btnStart")?.addEventListener("click", start);
           $("btnStop")?.addEventListener("click", stop);
         })();
+    </script>
+    @*JS cho cập nhật trạng thái máy*@
+    <script>
+        const $ = (id) => document.getElementById(id);
+
+        function setText(id, val) {
+          const el = $(id);
+          if (el) el.textContent = (val ?? "--");
+        }
+
+        function getLine() {
+          // lineSelect của bạn là select 1..4
+          const v = $("lineSelect")?.value || "1";
+          const n = parseInt(v, 10);
+          return Number.isFinite(n) ? n : 1;
+        }
+
+        function statusDesc(s) {
+          if (s === "RUN") return "Máy đang chạy";
+          if (s === "STOP") return "Máy đang dừng";
+          return "Chưa kết nối PLC";
+        }
+
+        async function loadMachineStatus() {
+          const line = getLine();
+          setText("statusLineText", line);
+
+          const r = await fetch(`/plc/machine-status?line=${encodeURIComponent(line)}`, { cache: "no-store" });
+          const j = await r.json().catch(() => null);
+
+          if (!j || !j.ok) {
+            for (let i = 1; i <= 4; i++) {
+              setText(`st_line_m${i}`, `Dây chuyền ${line}`);
+              setText(`st_desc_m${i}`, "--");
+            }
+            return;
+          }
+
+          const arr = [j.m1, j.m2, j.m3, j.m4];
+          for (let i = 1; i <= 4; i++) {
+            const st = arr[i - 1];
+            setText(`st_line_m${i}`, `Dây chuyền ${line}`);
+            setText(`st_desc_m${i}`, `${st} - ${statusDesc(st)}`);
+          }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+          loadMachineStatus();
+
+          // đổi dây chuyền cập nhật ngay
+          $("lineSelect")?.addEventListener("change", loadMachineStatus);
+
+          // auto refresh mỗi 1s (đổi theo pollMs nếu muốn)
+          setInterval(loadMachineStatus, 1000);
+        });
     </script>
 
 }

@@ -321,5 +321,53 @@ namespace TEST1_SCADA.Controllers
                 return Json(new { ok = false, message = ex.Message });
             }
         }
+        // hàm đọc 1 byte từ DB PLC 
+        private byte ReadDbByte(int db, int dbbOffset)
+        {
+            var obj = _plc.Read($"DB{db}.DBB{dbbOffset}");
+            return Convert.ToByte(obj);
+        }
+
+        private string DecodeMachineStatus(byte b)
+        {
+            bool stop = (b & 0b0000_0001) != 0; // bit0
+            bool run = (b & 0b0000_0010) != 0; // bit1
+
+            if (run) return "RUN";
+            if (stop) return "STOP";
+            return "UNKNOWN";
+        }
+        // GET /plc/machine-status
+        [HttpGet("machine-status")]
+        public IActionResult MachineStatus([FromQuery] int line = 1)
+        {
+            try
+            {
+                EnsureConnected(); // nếu bạn muốn bắt buộc connect trước thì đổi như Bước 5
+
+                // DB12: 4 byte trạng thái
+                var s1 = ReadDbByte(12, 0);
+                var s2 = ReadDbByte(12, 1);
+                var s3 = ReadDbByte(12, 2);
+                var s4 = ReadDbByte(12, 3);
+
+                return Json(new
+                {
+                    ok = true,
+                    updatedAt = DateTime.Now.ToString("HH:mm:ss"),
+                    line = line,
+                    m1 = DecodeMachineStatus(s1),
+                    m2 = DecodeMachineStatus(s2),
+                    m3 = DecodeMachineStatus(s3),
+                    m4 = DecodeMachineStatus(s4)
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "MachineStatus failed");
+                return Json(new { ok = false, message = ex.Message });
+            }
+        }
+
     }
 }

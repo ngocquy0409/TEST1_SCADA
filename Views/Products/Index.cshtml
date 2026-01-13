@@ -2,7 +2,7 @@
 
 <h2>Danh sách sản phẩm</h2>
 
-@if (User.IsInRole("Admin"))
+@if (User.IsInRole("Admin") || User.IsInRole("Operator"))
 {
     <p>
         <a asp-action="Create" class="btn btn-primary">Thêm sản phẩm</a>
@@ -14,7 +14,7 @@
         <tr>
             <th>Mã Sản Phẩm</th>
             <th>Tên Sản Phẩm</th>
-            @if (User.IsInRole("Admin"))
+            @if (User.IsInRole("Admin") || User.IsInRole("Operator"))
             {
                 <th>Thao tác</th>
             }
@@ -27,7 +27,7 @@
             <tr>
                 <td>@item.MaSanPham</td>
                 <td>@item.TenSanPham</td>
-                @if (User.IsInRole("Admin"))
+                @if (User.IsInRole("Admin") || User.IsInRole("Operator"))
                 {
                     <td>
                         <a asp-action="Details" asp-route-id="@item.Id">Chi tiết</a> |
