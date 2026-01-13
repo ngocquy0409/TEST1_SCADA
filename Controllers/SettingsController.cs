@@ -340,17 +340,20 @@ namespace TEST1_SCADA.Controllers
         // kết thúc API lưu cấu hình tham số
         // API lấy danh sách cấu hình tham số để hiển thị trong bảng
         [HttpGet]
-        public IActionResult GetLatestParameterSetting()
+        public IActionResult GetLatestParameterSetting(string tenDayChuyen, string tenMay, string ca)
         {
-            // lấy cấu hình tham số mới nhất (theo Id lớn nhất)
+            if (string.IsNullOrWhiteSpace(tenDayChuyen) ||
+                string.IsNullOrWhiteSpace(tenMay) ||
+                string.IsNullOrWhiteSpace(ca))
+                return BadRequest(new { ok = false, message = "Thiếu tenDayChuyen/tenMay/ca" });
+
             var last = _context.ParameterSettings
+                .Where(x => x.TenDayChuyen == tenDayChuyen
+                         && x.TenMay == tenMay
+                         && x.Ca == ca)
                 .OrderByDescending(x => x.Id)
                 .Select(x => new {
                     x.Id,
-                    x.CaiDatThamSo,
-                    x.TenDayChuyen,
-                    x.TenMay,
-                    x.Ca,
                     x.SanPhamId,
                     x.TocDoChuan,
                     x.ThoiGianDungMay,
@@ -361,7 +364,7 @@ namespace TEST1_SCADA.Controllers
                 })
                 .FirstOrDefault();
 
-            return Json(last);
+            return Json(new { ok = true, data = last });
         }
     }
 }

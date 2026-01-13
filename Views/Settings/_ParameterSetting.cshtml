@@ -243,6 +243,58 @@
           }, true);
         });
     </script>
+    @*JS để lấy dữ liệu mới nhất hiển thị lên trang cài đặt thông số*@
+    <script>
+        const $ = (id) => document.getElementById(id);
+
+        function getCtx() {
+          return {
+            tenDayChuyen: $("paramDayChuyen")?.value || "",
+            tenMay: $("paramTenMay")?.value || "",
+            ca: $("paramCa")?.value || ""
+          };
+        }
+
+        function fillSetting(d) {
+          if (!d) return;
+
+          // nếu bạn muốn set cả mã SP theo bản mới nhất:
+          if ($("paramSanPhamSelect") && d.sanPhamId != null) {
+            $("paramSanPhamSelect").value = String(d.sanPhamId);
+            // nếu bạn đang có code auto-fill tên SP theo data-name thì trigger change:
+            $("paramSanPhamSelect").dispatchEvent(new Event("change"));
+          }
+
+          $("paramTocDo").value = d.tocDoChuan ?? "";
+          $("paramDungMay").value = d.thoiGianDungMay ?? "";
+          $("paramChapNhan").value = d.thoiGianChapNhanGoi ?? "";
+          $("paramGoiCan").value = d.thoiGianGoiCan ?? "";
+          $("paramDayGoiCan").value = d.thoiGianDayGoiCan ?? "";
+          $("paramCapNhatPLC").value = d.thoiGianCapNhatTuPLC ?? "";
+        }
+
+        async function loadLatestSetting() {
+          const ctx = getCtx();
+          const url = `/Settings/GetLatestParameterSetting?tenDayChuyen=${encodeURIComponent(ctx.tenDayChuyen)}&tenMay=${encodeURIComponent(ctx.tenMay)}&ca=${encodeURIComponent(ctx.ca)}`;
+
+          const r = await fetch(url, { cache: "no-store" });
+          const j = await r.json().catch(() => null);
+
+          if (!j || !j.ok) return;
+
+          fillSetting(j.data);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+          // 1) mở/reload trang: tự nạp bản mới nhất
+          loadLatestSetting();
+
+          // 2) đổi dây chuyền/máy/ca: nạp bản mới nhất theo lựa chọn mới
+          ["paramDayChuyen", "paramTenMay", "paramCa"].forEach(id => {
+            $(id)?.addEventListener("change", loadLatestSetting);
+          });
+        });
+    </script>
 
 }
 

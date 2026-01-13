@@ -321,60 +321,72 @@ namespace TEST1_SCADA.Controllers
                 return Json(new { ok = false, message = ex.Message });
             }
         }
-        // hàm đọc 1 byte từ DB PLC 
         private byte ReadDbByte(int db, int dbbOffset)
         {
             var obj = _plc.Read($"DB{db}.DBB{dbbOffset}");
+            if (obj is byte b) return b;
             return Convert.ToByte(obj);
         }
 
-        private string DecodeMachineStatus(byte b)
+        private string DecodeRunStop(byte b)
         {
-            bool stop = (b & 0b0000_0001) != 0; // bit0
-            bool run = (b & 0b0000_0010) != 0; // bit1
+            bool stop = (b & (1 << 0)) != 0; // bit0
+            bool run = (b & (1 << 1)) != 0; // bit1
 
             if (run) return "RUN";
             if (stop) return "STOP";
             return "UNKNOWN";
         }
-        // GET /plc/machine-status
+
+        // GET /plc/machine-status?line=1
         [HttpGet("machine-status")]
         public IActionResult MachineStatus([FromQuery] int line = 1)
         {
             try
             {
-                EnsureConnected(); // nếu bạn muốn bắt buộc connect trước thì đổi như Bước 5
+                // bạn muốn: chưa connect thì trả Unknown
+                if (_plc == null || !_plc.IsConnected)
+                    return Json(new { ok = false, message = "Chưa kết nối đến PLC!" });
 
-                // DB12: 4 byte trạng thái
-                var s1 = ReadDbByte(12, 0);
-                var s2 = ReadDbByte(12, 1);
-                var s3 = ReadDbByte(12, 2);
-                var s4 = ReadDbByte(12, 3);
+                // line 1..4
+                if (line < 1) line = 1;
+                if (line > 4) line = 4;
+
+                // Mỗi line chiếm 4 byte, mỗi máy 1 byte
+                int startByte = (line - 1) * 4;
+
+                // đọc 4 byte: Status_1..Status_4 của line đó
+                // DB12.DBB(startByte..startByte+3)
+                var bytes = _plc.ReadBytes(DataType.DataBlock, 12, startByte, 4);
+
+                string Decode(byte b)
+                {
+                    bool stop = (b & (1 << 0)) != 0; // bit0
+                    bool run = (b & (1 << 1)) != 0; // bit1
+                                                  
+
+                    if (run) return "RUN";
+                    if (stop) return "STOP";
+                    return "UNKNOWN";
+                }
 
                 return Json(new
                 {
                     ok = true,
-                    updatedAt = DateTime.Now.ToString("HH:mm:ss"),
-                    line = line,
-                    m1 = DecodeMachineStatus(s1),
-                    m2 = DecodeMachineStatus(s2),
-                    m3 = DecodeMachineStatus(s3),
-                    m4 = DecodeMachineStatus(s4)
+                    line,
+                    m1 = Decode(bytes[0]),
+                    m2 = Decode(bytes[1]),
+                    m3 = Decode(bytes[2]),
+                    m4 = Decode(bytes[3]),
+                    raw = new[] { bytes[0], bytes[1], bytes[2], bytes[3] } // debug (có thể bỏ)
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "MachineStatus failed");
+                _logger.LogError(ex, "machine-status failed");
                 return Json(new { ok = false, message = ex.Message });
             }
         }
-        // đảm bảo trạng thái kết nối đến PLC
-        [HttpGet("status")]
-        public IActionResult Status()
-        {
-            return Json(new { connected = _plc != null && _plc.IsConnected });
-        }
-
 
     }
 }

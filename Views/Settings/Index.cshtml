@@ -404,7 +404,7 @@
             loadProductionTable();
           });
     </script>
-    @*Auto0fill tên sản phẩm khi chọn mã sản phẩm cho trang cài đặt thông số*@
+    @*Auto-fill tên sản phẩm khi chọn mã sản phẩm cho trang cài đặt thông số*@
     <script>
         document.addEventListener("change", function(e){
           if(e.target.id !== "paramSanPhamSelect") return;
@@ -503,6 +503,7 @@
             const t = await r.text();
             if(!r.ok) return alert("Lưu thất bại: " + t);
             alert("Đã lưu thông số!");
+            loadLatestParam();
           })
           .catch(err=>{
             console.error(err);
@@ -542,6 +543,15 @@
 
         document.querySelector('button[data-bs-target="#parameter"]')
           ?.addEventListener("shown.bs.tab", loadLatestParam);
+                  document.addEventListener("DOMContentLoaded", () => {
+          // nếu tab Thông số đang active ngay khi load trang
+          const pane = document.querySelector("#parameter");
+          if (pane && pane.classList.contains("active")) {
+            loadLatestParam();
+          }
+          loadLatestParam();
+        });
+
     </script>
     @*JS auto-fill tên sản phẩm khi chọn mã sản phẩm*@
     <script>

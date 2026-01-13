@@ -96,19 +96,21 @@
             background: #dcfce7; /* xanh lá nhạt */
         }
     /*Màu sắc cho trạng thái máy*/
-    .machine-stop {
-        background-color: #f8d7da;
-        border: 2px solid #dc3545;
+    
+    /* màu theo trạng thái */
+    .st-unk {
+        background: #f1f3f5;
+        border: 1px solid #ced4da;
     }
 
-    .machine-run {
-        background-color: #cff4fc;
-        border: 2px solid #0d6efd;
+    .st-run {
+        background: #d3f9d8;
+        border: 1px solid #2f9e44;
     }
 
-    .machine-unknown {
-        background-color: #f1f3f5;
-        border: 2px solid #adb5bd;
+    .st-stop {
+        background: #ffe3e3;
+        border: 1px solid #e03131;
     }
 </style>
 
@@ -263,7 +265,7 @@
                                 @for (int i = 1; i <= 4; i++)
                                 {
                                     <div class="col-12 col-md-6 col-xl-3">
-                                        <div class="border rounded-3 p-3 h-100 machine-box machine-unknown" id="machineBox@(i)">
+                                        <div class="border rounded-3 p-3 h-100 st-unk" id="st_card_m@(i)">
                                             <div class="d-flex justify-content-between align-items-center mb-2">
                                                 <div class="fw-bold">Máy @i</div>
                                                 
@@ -567,7 +569,7 @@
 
         function setText(id, val) {
           const el = $(id);
-          if (el) el.textContent = (val ?? "Unknown");
+          if (el) el.textContent = (val ?? "--");
         }
 
         function getLine() {
@@ -576,77 +578,55 @@
           return Number.isFinite(n) ? n : 1;
         }
 
-        function setMachineUI(i, status, line) {
-          const box = $(`machineBox${i}`);
-          const desc = $(`st_desc_m${i}`);
-          const lineEl = $(`st_line_m${i}`);
-
-          if (!box) return;
-
-          box.classList.remove("machine-run","machine-stop","machine-unknown");
-
-          if (status === "RUN") {
-            box.classList.add("machine-run");
-            desc.textContent = "RUN - Máy đang chạy";
-          }
-          else if (status === "STOP") {
-            box.classList.add("machine-stop");
-            desc.textContent = "STOP - Máy đang dừng";
-          }
-          else {
-            box.classList.add("machine-unknown");
-            desc.textContent = "Unknown";
-          }
-
-          if (lineEl) lineEl.textContent = `Dây chuyền ${line}`;
+        function statusDesc(s) {
+          if (s === "RUN") return "Máy đang chạy";
+          if (s === "STOP") return "Máy đang dừng";
+          return "Chưa xác định";
         }
 
-        async function isPlcConnected() {
-          const r = await fetch("/plc/status", { cache: "no-store" });
-          const j = await r.json().catch(()=>({}));
-          return !!j.connected;
+        // đổi màu card theo trạng thái
+        function setCardColor(i, st) {
+          const card = document.getElementById(`st_card_m${i}`); // thêm id này ở view (bên dưới)
+          if (!card) return;
+
+          card.classList.remove("st-run", "st-stop", "st-unk");
+          if (st === "RUN") card.classList.add("st-run");
+          else if (st === "STOP") card.classList.add("st-stop");
+          else card.classList.add("st-unk");
         }
 
         async function loadMachineStatus() {
           const line = getLine();
           setText("statusLineText", line);
 
-          const connected = await isPlcConnected();
-          if (!connected) {
-            for (let i = 1; i <= 4; i++) {
-              setMachineUI(i, "UNKNOWN", line);
-            }
-            return;
-          }
+          const r = await fetch(`/plc/machine-status?line=${encodeURIComponent(line)}`, { cache: "no-store" });
+          const j = await r.json().catch(() => null);
 
-          const r = await fetch(`/plc/machine-status?line=${line}`, { cache: "no-store" });
-          const j = await r.json().catch(()=>null);
-
+          // chưa connect / lỗi => Unknown hết
           if (!j || !j.ok) {
             for (let i = 1; i <= 4; i++) {
-              setMachineUI(i, "UNKNOWN", line);
+              setText(`st_line_m${i}`, `Dây chuyền ${line}`);
+              setText(`st_desc_m${i}`, `UNKNOWN - ${statusDesc("UNKNOWN")}`);
+              setCardColor(i, "UNKNOWN");
             }
             return;
           }
 
-          setMachineUI(1, j.m1, line);
-          setMachineUI(2, j.m2, line);
-          setMachineUI(3, j.m3, line);
-          setMachineUI(4, j.m4, line);
+          const arr = [j.m1, j.m2, j.m3, j.m4];
+          for (let i = 1; i <= 4; i++) {
+            const st = arr[i - 1] || "UNKNOWN";
+            setText(`st_line_m${i}`, `Dây chuyền ${line}`);
+            setText(`st_desc_m${i}`, `${st} - ${statusDesc(st)}`);
+            setCardColor(i, st);
+          }
         }
 
         document.addEventListener("DOMContentLoaded", () => {
-          for (let i = 1; i <= 4; i++) {
-            setMachineUI(i, "UNKNOWN", getLine());
-          }
-
           loadMachineStatus();
           $("lineSelect")?.addEventListener("change", loadMachineStatus);
           setInterval(loadMachineStatus, 1000);
         });
     </script>
-
-
 }
 
 
