@@ -321,22 +321,6 @@ namespace TEST1_SCADA.Controllers
                 return Json(new { ok = false, message = ex.Message });
             }
         }
-        private byte ReadDbByte(int db, int dbbOffset)
-        {
-            var obj = _plc.Read($"DB{db}.DBB{dbbOffset}");
-            if (obj is byte b) return b;
-            return Convert.ToByte(obj);
-        }
-
-        private string DecodeRunStop(byte b)
-        {
-            bool stop = (b & (1 << 0)) != 0; // bit0
-            bool run = (b & (1 << 1)) != 0; // bit1
-
-            if (run) return "RUN";
-            if (stop) return "STOP";
-            return "UNKNOWN";
-        }
 
         // GET /plc/machine-status?line=1
         [HttpGet("machine-status")]

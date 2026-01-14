@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+
 // using Microsoft.AspNetCore.Identity.UI; // cần thêm gói này để đảm bảo hoạt động đúng chức năng phân quyền
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,7 +9,15 @@ using TEST1_SCADA.Data;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
+// cho phép lắng nghe trên bất kỳ máy nào trong mạng
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(44310, ListenOptions =>
+    {
+        ListenOptions.UseHttps();
+    });
+    options.ListenAnyIP(5024);
+});
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
