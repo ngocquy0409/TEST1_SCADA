@@ -323,6 +323,7 @@ namespace TEST1_SCADA.Controllers
         }
 
         // GET /plc/machine-status?line=1
+        // GET /plc/machine-status?line=1
         [HttpGet("machine-status")]
         public IActionResult MachineStatus([FromQuery] int line = 1)
         {
@@ -347,7 +348,7 @@ namespace TEST1_SCADA.Controllers
                 {
                     bool stop = (b & (1 << 0)) != 0; // bit0
                     bool run = (b & (1 << 1)) != 0; // bit1
-                                                  
+
 
                     if (run) return "RUN";
                     if (stop) return "STOP";
@@ -371,6 +372,7 @@ namespace TEST1_SCADA.Controllers
                 return Json(new { ok = false, message = ex.Message });
             }
         }
+
 
     }
 }

@@ -23,5 +23,6 @@ namespace TEST1_SCADA.Data
         public DbSet<MonitorRecord> MonitorRecords { get; set; } = default!; // bảng lưu dữ liệu giám sát từ PLC
         public DbSet<ReportRecord> ReportRecords { get; set; }  // bảng lưu dữ liệu báo cáo hàng ngày 
 
+
     }
 }
