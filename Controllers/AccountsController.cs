@@ -126,7 +126,7 @@ namespace TEST1_SCADA.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false); // Đăng nhập người dùng
                 if (result.Succeeded) //    Nếu đăng nhập thành công
                 {
-                    return RedirectToAction("Index", "Products"); // Chuyển hướng đến trang chủ
+                    return RedirectToAction("Index", "Home"); // Chuyển hướng đến trang chủ
                 }
                 ModelState.AddModelError(string.Empty, "Đăng nhập không thành công."); // Thêm lỗi vào trạng thái mô hình nếu đăng nhập thất bại
             }
