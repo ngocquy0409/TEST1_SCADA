@@ -138,7 +138,7 @@ namespace TEST1_SCADA.Controllers
         public async Task<IActionResult> Logout() // Xử lý đăng xuất người dùng
         {
             await _signInManager.SignOutAsync(); // Đăng xuất người dùng
-            return RedirectToAction("Index", "Products"); // Chuyển hướng đến trang chủ
+            return RedirectToAction("Index", "Home"); // Chuyển hướng đến trang chủ
         }
         [Authorize]
         [HttpGet]
