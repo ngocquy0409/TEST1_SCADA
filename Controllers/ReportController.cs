@@ -274,7 +274,7 @@ namespace TEST1_SCADA.Controllers
                 Bullet("Phần trăm dừng máy", rec.StopPct, " %");
                 Bullet("Phần trăm hỏng máy", rec.FaultPct, " %");
                 Bullet("Availability Rate", rec.A, " %");
-                Note("Đánh giá nếu trên 90% là tốt, dưới 90% là xấu");
+                //Note("Đánh giá nếu trên 90% là tốt, dưới 90% là xấu");
 
                 // ỔN ĐỊNH 
                 body.Append(Para("2.   Đánh giá độ ổn định", fontSize: 24));
@@ -282,14 +282,14 @@ namespace TEST1_SCADA.Controllers
                 Bullet("Tốc độ trung bình", rec.Vtb, " gói/phút");
                 Bullet("Thời gian dừng nhỏ", rec.MinorStopPct, " %");
                 Bullet("Performance Rate", rec.P, " %");
-                Note("Đánh giá nếu trên 90% là tốt, dưới 90% là xấu");
+                //Note("Đánh giá nếu trên 90% là tốt, dưới 90% là xấu");
 
                 // CHẤT LƯỢNG 
                 body.Append(Para("3.   Đánh giá chất lượng", fontSize: 24));
                 Bullet("Phần trăm gói cấn gia vị", rec.SpicePct, " %");
                 Bullet("Phần trăm gói rỗng", rec.EmptyPct, " %");
                 Bullet("Quality Rate", rec.Q, " %");
-                Note("Đánh giá nếu trên 90% là tốt, dưới 90% là xấu");
+                //Note("Đánh giá nếu trên 90% là tốt, dưới 90% là xấu");
 
                 // HIỆU SUẤT 
                 body.Append(Para("4.   Đánh giá tổng thể hiệu suất", fontSize: 24));
