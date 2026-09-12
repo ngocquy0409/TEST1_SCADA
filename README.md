@@ -2,7 +2,7 @@
 - Đôi khi t cũng không biết t đang code cái gì cả nên tự học đi... GPT hỗ trợ cho
 -  Đéo có gì trong này để đọc đâu nên ấn vào là vô nghĩa
 -  Code này là toàn bộ những gì mà tao (Quý) đã thực hiện cùng cái nhóm củ cứt nào đấy gồm Đào Ngọc Phan - Lương Trung Hiếu - Nguyễn Văn Trưởng
--  
+
 # Tự học MVC
 - Xem MVC là gì?
 - Cấu trúc MVC?
