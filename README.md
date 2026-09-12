@@ -10,8 +10,10 @@
 [https://learn.microsoft.com/vi-vn/aspnet/core/tutorials/first-mvc-app/start-mvc?view=aspnetcore-9.0&tabs=visual-studio](https://learn.microsoft.com/vi-vn/aspnet/core/tutorials/first-mvc-app/start-mvc?view=aspnetcore-9.0&tabs=visual-studio)
 - Link Youtube tiếng việt để học: [https://www.youtube.com/watch?v=Y_gJyI_3cZ4&list=PLf5IPckgFwFUdtFXnvNjwgFdflTjKk0gF](https://www.youtube.com/watch?v=Y_gJyI_3cZ4&list=PLf5IPckgFwFUdtFXnvNjwgFdflTjKk0gF)
 - Đọc về nhà máy MASAN Hải Dương trước trong Driver này nhé: [https://drive.google.com/drive/u/2/folders/1MjhY4KvMj9uCmHyBwZ06CCv82eM8IGPM]
-- Đọc thêm về cái này nữa: [(https://docs.google.com/document/d/1T_RjjgXzTjDXqyR2Z62gHd7a4fahCco-/edit?usp=sharing&ouid=116602784551489566292&rtpof=true&sd=true)]
+- Đọc thêm về cách học MVC ở đây nữa nhé (Nên đọc đầu tiên và tự làm đầu tiên): [https://docs.google.com/document/d/1T_RjjgXzTjDXqyR2Z62gHd7a4fahCco-/edit?usp=sharing&ouid=116602784551489566292&rtpof=true&sd=true]
 - Nên đọc trước cái file docs có tên "Cài Đặt + Setup + Các kiểu hay dùng trong MVC ( nên đọc trước)" nhé
+- File docs báo cáo:
+- File PPT báo cáo:
 - Chúc các con vợ đọc code đéo hiểu mẹ gì!!!
 # LƯU Ý CỰC KỲ KINH KHỦNG:
 - Khi đọc code, để dễ hiểu, khuyến cáo chúng mày dow cái file zip của git này về rồi giải nén ra, mở bằng VS tím, mỗi đoạn code chỉ cần thêm comment đằng sau cho nó theo kiểu "\\\ " thì nó sẽ tự comment cho đoạn code đó viết cái gì, nội dung ra sao
@@ -29,4 +31,6 @@
 1. dotnet add package ClosedXML			=> dùng để tạo excel
 2. dotnet add package Xceed.Words.NET		=> dùng để tạo word, nhưng phải có license => ko dùng
 3. dotnet add package DocumentFormat.OpenXml	=> dùng thay thế bằng cái này để tạo word
-# Chưa có gì mới
+# Khi mở code này, nếu đéo biết chạy kiểu gì thì cứ liên hệ tao qua 2 phương thức:
+- Facebook: [https://www.facebook.com/nguyenngocquy040903]
+- Zalo: 0385263527
