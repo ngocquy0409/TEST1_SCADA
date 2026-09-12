@@ -1,6 +1,8 @@
 # Hướng dẫn sử dụng code MVC cho hệ SCADA Hải Dương
 - Đôi khi t cũng không biết t đang code cái gì cả nên tự học đi... GPT hỗ trợ cho
 -  Đéo có gì trong này để đọc đâu nên ấn vào là vô nghĩa
+-  Code này là toàn bộ những gì mà tao (Quý) đã thực hiện cùng cái nhóm củ cứt nào đấy gồm Đào Ngọc Phan - Lương Trung Hiếu - Nguyễn Văn Trưởng
+-  
 # Tự học MVC
 - Xem MVC là gì?
 - Cấu trúc MVC?
@@ -12,8 +14,8 @@
 - Đọc về nhà máy MASAN Hải Dương trước trong Driver này nhé: [https://drive.google.com/drive/u/2/folders/1MjhY4KvMj9uCmHyBwZ06CCv82eM8IGPM]
 - Đọc thêm về cách học MVC ở đây nữa nhé (Nên đọc đầu tiên và tự làm đầu tiên): [https://docs.google.com/document/d/1T_RjjgXzTjDXqyR2Z62gHd7a4fahCco-/edit?usp=sharing&ouid=116602784551489566292&rtpof=true&sd=true]
 - Nên đọc trước cái file docs có tên "Cài Đặt + Setup + Các kiểu hay dùng trong MVC ( nên đọc trước)" nhé
-- File docs báo cáo:
-- File PPT báo cáo:
+- File docs báo cáo: [https://drive.google.com/drive/u/2/folders/1cfRL5ACGSK4B33n_beSjTOupxTF5ghMn]
+- File PPT báo cáo: [https://drive.google.com/drive/u/2/folders/1cfRL5ACGSK4B33n_beSjTOupxTF5ghMn]
 - Chúc các con vợ đọc code đéo hiểu mẹ gì!!!
 # LƯU Ý CỰC KỲ KINH KHỦNG:
 - Khi đọc code, để dễ hiểu, khuyến cáo chúng mày dow cái file zip của git này về rồi giải nén ra, mở bằng VS tím, mỗi đoạn code chỉ cần thêm comment đằng sau cho nó theo kiểu "\\\ " thì nó sẽ tự comment cho đoạn code đó viết cái gì, nội dung ra sao
