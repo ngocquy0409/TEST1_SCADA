@@ -9,8 +9,7 @@
 - Link xem MVC của nước ngoài
 [https://learn.microsoft.com/vi-vn/aspnet/core/tutorials/first-mvc-app/start-mvc?view=aspnetcore-9.0&tabs=visual-studio](https://learn.microsoft.com/vi-vn/aspnet/core/tutorials/first-mvc-app/start-mvc?view=aspnetcore-9.0&tabs=visual-studio)
 - Link Youtube tiếng việt để học: [https://www.youtube.com/watch?v=Y_gJyI_3cZ4&list=PLf5IPckgFwFUdtFXnvNjwgFdflTjKk0gF](https://www.youtube.com/watch?v=Y_gJyI_3cZ4&list=PLf5IPckgFwFUdtFXnvNjwgFdflTjKk0gF)
-- Đọc về nhà máy MASAN Hải Dương trước trong Driver này nhé
-[https://drive.google.com/drive/folders/18_1GirnJFnhpheAmMG6UFb6MjHGpGdj1?usp=drive_link](https://drive.google.com/drive/folders/18_1GirnJFnhpheAmMG6UFb6MjHGpGdj1?usp=drive_link)
+- Đọc về nhà máy MASAN Hải Dương trước trong Driver này nhé: [https://drive.google.com/drive/u/2/folders/1MjhY4KvMj9uCmHyBwZ06CCv82eM8IGPM]
 - Nên đọc trước cái file docs có tên "Cài Đặt + Setup + Các kiểu hay dùng trong MVC ( nên đọc trước)" nhé
 - Chúc các con vợ đọc code đéo hiểu mẹ gì!!!
 # LƯU Ý CỰC KỲ KINH KHỦNG:
